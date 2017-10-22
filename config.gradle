@@ -1,0 +1,87 @@
+
+ext {
+    android = [
+            compileSdkVersion : 26,
+            buildToolsVersion : "26.0.1",
+            minSdkVersion : 14,
+            targetSdkVersion : 26,
+    ]
+}
+
+//解决添加.gitignore后没有反应
+task removeGitCache () {
+    Runtime.getRuntime().exec('git status')
+    Runtime.getRuntime().exec('git rm -r --cached .')
+    Runtime.getRuntime().exec('git add .')
+
+    Runtime.getRuntime().exec('git commit -m \'update .gitignore\'')
+    logger.quiet "clear SUCCESS"
+}
+
+
+ext.versionFile = file("${getProjectDir()}"+"/version.properties")
+
+task load1Version(){
+    project.version = read1Version()
+}
+
+
+class ProjectVersion{
+    Integer versionCode
+    String versionName
+    Integer compileSdkVersion
+    String buildToolsVersion
+    Integer minSdkVersion
+    Integer targetSdkVersion
+    ProjectVersion(Integer versionCode,String versionName,Integer compileSdkVersion,String buildToolsVersion,Integer minSdkVersion,Integer targetSdkVersion){
+        this.versionCode = versionCode
+        this.versionName = versionName
+
+        this.compileSdkVersion = compileSdkVersion
+        this.buildToolsVersion = buildToolsVersion
+
+        this.minSdkVersion  = minSdkVersion
+        this.targetSdkVersion  = targetSdkVersion
+    }
+}
+
+ProjectVersion read1Version(){
+    logger.quiet 'Reading the version file'
+    if(!versionFile.exists()){
+
+    }
+
+    Properties properties = new Properties()
+
+    versionFile.withInputStream{ stream ->
+        properties.load(stream)
+    }
+
+    logger.quiet "code = ${properties.versionCode.toInteger()}  name = ${properties.versionName}"
+    new ProjectVersion(properties.versionCode.toInteger(),//
+            properties.versionName,//
+            properties.compileSdkVersion.toInteger(),//
+            properties.buildToolsVersion,//
+            properties.minSdkVersion.toInteger(),//
+            properties.targetSdkVersion.toInteger())
+
+}
+
+
+task setConfig{
+        project.subprojects.each {
+            println "it.name = ${it.name}"
+
+            it.rootProject.android.compileSdkVersion = project.version.compileSdkVersion
+            it.rootProject.android.buildToolsVersion = project.version.buildToolsVersion
+
+            it.rootProject.android.minSdkVersion = project.version.minSdkVersion
+            it.rootProject.android.targetSdkVersion = project.version.targetSdkVersion
+
+            it.rootProject.android.versionCode = project.version.versionCode
+            it.rootProject.android.versionName = project.version.versionName
+            println "it.versionName = ${it.rootProject.android.versionName}"
+            println "it.versionCode = ${it.rootProject.android.versionCode}"
+    }
+}
+
