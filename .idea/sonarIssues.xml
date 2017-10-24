@@ -8,7 +8,17 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/../DBQ_VPN/vpncore/build.gradle">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/../FloatWindowDemo/build.gradle">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/.gitignore">
           <value>
             <set />
           </value>
@@ -18,7 +28,37 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/app/app.iml">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/app/build.gradle">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/AndroidManifest.xml">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/demo/alipay/yiba/com/ybpaydemo/MainActivity.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/demo/alipay/yiba/com/ybpaydemo/PayApp.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/res/layout/activity_main.xml">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/res/values/strings.xml">
           <value>
             <set />
           </value>
@@ -48,7 +88,112 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/ybpaylibrary/src/main/AndroidManifest.xml">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/ybpaylibrary/src/main/java/com/yiba/pay/IAliOrderInfo.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/ybpaylibrary/src/main/java/com/yiba/pay/IAliResultListener.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/ybpaylibrary/src/main/java/com/yiba/pay/IOrderInfo.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/ybpaylibrary/src/main/java/com/yiba/pay/IResultListener.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/ybpaylibrary/src/main/java/com/yiba/pay/IWxOrderInfo.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/ybpaylibrary/src/main/java/com/yiba/pay/IWxResultListener.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/ybpaylibrary/src/main/java/com/yiba/pay/IYibaPayInfo.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/ybpaylibrary/src/main/java/com/yiba/pay/PayWindow.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/ybpaylibrary/src/main/java/com/yiba/pay/TestUtils.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/ybpaylibrary/src/main/java/com/yiba/pay/YiBaPayConfig.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/ybpaylibrary/src/main/java/com/yiba/pay/YiBaPayManager.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/ybpaylibrary/src/main/res/drawable/pay_bg.xml">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/ybpaylibrary/src/main/res/layout/popupwindow_pay.xml">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/ybpaylibrary/src/main/res/values/colors.xml">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/ybpaylibrary/src/main/res/values/menu_bottombar_in.xml">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/ybpaylibrary/src/main/res/values/menu_bottombar_out.xml">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/ybpaylibrary/src/main/res/values/strings.xml">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/ybpaylibrary/src/main/res/values/style.xml">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$USER_HOME$/Desktop/AndroidDemo_2.0/alipay_demo/app/build.gradle">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="/a.dummy">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="/fragment.java">
           <value>
             <set />
           </value>

@@ -15,14 +15,32 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            resValue("string", "app_name", "易跋Pay")
+        }
+        debug{
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            resValue("string", "app_name", "易跋Pay-测试")
         }
     }
-}
+    //修改生成的apk名字
+    applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            def outputFile = output.outputFile
+            if (outputFile != null && outputFile.name.endsWith('.apk')) {
+                def fileName = outputFile.name.replace("app",
+                        "yibaPay-v${defaultConfig.versionName}_${releaseTime()}")
+                outputFileName = fileName
+            }
+        }
+    }
 
+}
 
 
 dependencies {
@@ -33,5 +51,6 @@ dependencies {
     androidTestImplementation('com.android.support.test.espresso:espresso-core:3.0.1', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
+    implementation(name: "yibaPay-v2.5.3_${releaseTime()}-release", ext: 'aar')
 }
 

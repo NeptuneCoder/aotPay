@@ -9,6 +9,7 @@ buildscript {
     repositories {
         google()
         jcenter()
+
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.0.0-beta5'
@@ -23,8 +24,16 @@ allprojects {
     repositories {
         google()
         jcenter()
+        flatDir {
+            dirs '../aars'
+        }
     }
 }
+//这个函数定义在这里是为了全局调用
+def releaseTime() {
+    new Date().format("yyyy-MM-dd", TimeZone.getTimeZone("UTC"))
+}
+
 
 task clean(type: Delete) {
     delete rootProject.buildDir

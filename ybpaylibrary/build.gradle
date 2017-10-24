@@ -3,6 +3,9 @@ apply plugin: 'com.android.library'
 android {
     compileSdkVersion rootProject.android.compileSdkVersion
     buildToolsVersion rootProject.android.buildToolsVersion
+    lintOptions {
+        abortOnError false
+    }
 
 
     defaultConfig {
@@ -10,9 +13,7 @@ android {
         targetSdkVersion rootProject.android.targetSdkVersion
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
     }
-
 
 
     buildTypes {
@@ -21,14 +22,51 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    //修改生成的apk名字
+    libraryVariants.all { variant ->
+        variant.outputs.all { output ->
+            def outputFile = output.outputFile
+            if (outputFile != null && outputFile.name.endsWith('.aar')) {
+                def fileName = outputFile.name.replace("ybpaylibrary",
+                        "yibaPay-v${rootProject.android.versionName}_${releaseTime()}")
+                outputFileName = fileName
+            }
+        }
+    }
 }
 
+
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     testImplementation 'junit:junit:4.12'
     androidTestImplementation('com.android.support.test.espresso:espresso-core:3.0.1', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
+    //微信支付的依赖
+    implementation 'com.tencent.mm.opensdk:wechat-sdk-android-without-mta:+'
+    implementation files('libs/alipaySdk-20170922.jar')
+
+    //stripe支付的依赖
+    implementation 'com.stripe:stripe-android:5.1.0'
+
+/* To use the Stripe android pay wrapper, you need these two lines */
+    implementation 'com.stripe:stripe-android-pay:4.1.5'
+    implementation ('com.google.android.gms:play-services-wallet:10.2.6'){
+        exclude group : 'ccom.android.support',module:'appcompat-v7'
+    }
 
 }
+assemble << {
+    logger.quiet("assemble exe finish")
+}
+
+
+task copy(type: Copy) {
+    copy.from('build/outputs/aar/')
+    copy.into('../aars')
+    copy.include('**/*.aar')
+    logger.quiet("copy success")
+}
+
+
