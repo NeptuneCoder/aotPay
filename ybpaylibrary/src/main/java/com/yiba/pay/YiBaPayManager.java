@@ -97,7 +97,11 @@ public class YiBaPayManager {
     public void setResultListener(IResultListener resultListener){
         this.resultListener  = resultListener;
     }
-    private void  alipay(){
+
+    /**
+     * 支付宝支付
+     */
+    public void  alipay(){
         if (aliOrderInfo == null){
             throw new NullPointerException("aliOrderInfo  为商品信息不能为空，需要实现 IWxOrderInfo 接口 同时调用setOrderInfo方法");
         }
@@ -119,10 +123,17 @@ public class YiBaPayManager {
         payThread.start();
     }
 
-    private void wxpay(){
+    /**
+     * 微信支付
+     */
+    public void wxpay(){
 
     }
-    private void stripepay(){
+
+    /**
+     * stripe 支付
+     */
+    public void stripepay(){
 
     }
 
@@ -131,12 +142,13 @@ public class YiBaPayManager {
      * @param parent
      */
     public void show(View parent){
-        PayWindow payWindow = new PayWindow(YiBaPayConfig.getContext());
+        final PayWindow payWindow = new PayWindow(YiBaPayConfig.getContext());
         payWindow.showAtLocation(parent);
         payWindow.setPayListener(new PayWindow.onPayListener() {
             @Override
             public void aliPay() {
                 alipay();
+                payWindow.dismiss();
             }
 
             @Override

@@ -8,12 +8,87 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/../DBQ/app/build.gradle">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../DBQ/app/src/main/AndroidManifest.xml">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../DBQ/app/src/main/java/com/dbq/fast/business/product/ServiceTypeActivity.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../DBQ/app/src/main/java/com/dbq/fast/common/net/ApiService.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../DBQ/app/src/main/java/com/dbq/fast/common/net/CommonTransformer.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../DBQ/app/src/main/java/com/dbq/fast/common/net/HttpMethods.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../DBQ/app/src/main/java/com/dbq/fast/main/BaseResponse.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../DBQ/app/src/main/java/com/dbq/fast/main/BssidsData.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../DBQ/app/src/main/java/com/dbq/fast/main/LocationResponse.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../DBQ/app/src/main/java/com/dbq/fast/main/MainActivity.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../DBQ/app/src/main/java/com/dbq/fast/my/MyCountActivity.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../DBQ/app/src/main/res/drawable/pay_bg.xml">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../DBQ/app/src/main/res/layout/adapter_product_item_view.xml">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/../DBQ_VPN/vpncore/build.gradle">
           <value>
             <set />
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/../FloatWindowDemo/build.gradle">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../haisong-column/app/build.gradle">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../haisong-column/app/src/main/kotlin/com/haisong/column/modules/column/ColumnActivity.kt">
           <value>
             <set />
           </value>
@@ -48,7 +123,17 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/demo/alipay/yiba/com/ybpaydemo/OrderInfoUtil2_0.java">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/app/src/main/java/demo/alipay/yiba/com/ybpaydemo/PayApp.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/demo/alipay/yiba/com/ybpaydemo/SignUtils.java">
           <value>
             <set />
           </value>
@@ -84,6 +169,16 @@
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/ybpaylibrary/build.gradle">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/ybpaylibrary/proguard-project.txt">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/ybpaylibrary/proguard-rules.pro">
           <value>
             <set />
           </value>
@@ -183,7 +278,57 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/../yibaAdManage/app/src/main/java/manage/ad/yiba/com/admanage/common/extension/BaseExtension.kt">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$USER_HOME$/Desktop/AndroidDemo_2.0/alipay_demo/app/build.gradle">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$USER_HOME$/Desktop/AndroidDemo_2.0/alipay_demo/app/build/intermediates/classes/debug/com/alipay/sdk/pay/demo/AuthResult.class">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$USER_HOME$/Desktop/AndroidDemo_2.0/alipay_demo/app/build/intermediates/classes/debug/com/alipay/sdk/pay/demo/Base64.class">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$USER_HOME$/Desktop/AndroidDemo_2.0/alipay_demo/app/build/intermediates/classes/debug/com/alipay/sdk/pay/demo/BuildConfig.class">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$USER_HOME$/Desktop/AndroidDemo_2.0/alipay_demo/app/build/intermediates/classes/debug/com/alipay/sdk/pay/demo/ExternalFragment.class">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$USER_HOME$/Desktop/AndroidDemo_2.0/alipay_demo/app/build/intermediates/classes/debug/com/alipay/sdk/pay/demo/H5PayDemoActivity.class">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$USER_HOME$/Desktop/AndroidDemo_2.0/alipay_demo/app/build/intermediates/classes/debug/com/alipay/sdk/pay/demo/PayDemoActivity.class">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$USER_HOME$/Desktop/AndroidDemo_2.0/alipay_demo/app/build/intermediates/classes/debug/com/alipay/sdk/pay/demo/PayResult.class">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$USER_HOME$/Desktop/AndroidDemo_2.0/alipay_demo/app/build/intermediates/classes/debug/com/alipay/sdk/pay/demo/R.class">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$USER_HOME$/Desktop/AndroidDemo_2.0/alipay_demo/app/src/main/java/com/alipay/sdk/pay/demo/PayDemoActivity.java">
           <value>
             <set />
           </value>

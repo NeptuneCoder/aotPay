@@ -50,6 +50,7 @@
         android:layout_width="match_parent"
         android:text="Stripe支付"
         android:id="@+id/stripe_pay"
+        android:gravity="center"
         android:layout_height="44dp" />
     <View
         android:layout_width="match_parent"
