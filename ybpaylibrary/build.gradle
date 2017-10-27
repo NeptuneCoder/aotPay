@@ -7,14 +7,10 @@ android {
         abortOnError false
     }
 
-
     defaultConfig {
         minSdkVersion rootProject.android.minSdkVersion
         targetSdkVersion rootProject.android.targetSdkVersion
-
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
-
 
     buildTypes {
         release {
@@ -38,16 +34,11 @@ android {
             }
         }
     }
-    buildToolsVersion '26.0.2'
 }
 
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation('com.android.support.test.espresso:espresso-core:3.0.1', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
     //微信支付的依赖
 //    implementation 'com.tencent.mm.opensdk:wechat-sdk-android-without-mta:+'
     implementation files('libs/alipaySdk-20170922.jar')
