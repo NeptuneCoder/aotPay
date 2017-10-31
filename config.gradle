@@ -9,7 +9,7 @@ ext {
 }
 
 //解决添加.gitignore后没有反应
-task removeGitCache () {
+task removeGitCache << {
     Runtime.getRuntime().exec('git status')
     Runtime.getRuntime().exec('git rm -r --cached .')
     Runtime.getRuntime().exec('git add .')
