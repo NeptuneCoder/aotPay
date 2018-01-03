@@ -40,11 +40,11 @@ public class MainActivity extends AppCompatActivity implements IAliOrderInfo,IWx
             @Override
             public void onClick(View view) {
 
-                if (!OrderInfoEt.getText().toString().trim().isEmpty()){
+//                if (!OrderInfoEt.getText().toString().trim().isEmpty()){
                     YiBaPayManager.getInstance().alipay();
-                }else{
-                    Toast.makeText(MainActivity.this,"订单信息不能为空",0).show();
-                }
+//                }else{
+//                    Toast.makeText(MainActivity.this,"订单信息不能为空",0).show();
+//                }
 
             }
         });
@@ -70,13 +70,13 @@ public class MainActivity extends AppCompatActivity implements IAliOrderInfo,IWx
      */
     @Override
     public String getAlipayInfo() {
-        boolean rsa2 = (RSA2_PRIVATE.length() > 0);
-        Map<String, String> params = OrderInfoUtil2_0.buildOrderParamMap(APPID, rsa2);
-        String orderParam = OrderInfoUtil2_0.buildOrderParam(params);
-
-        String privateKey = rsa2 ? RSA2_PRIVATE : RSA_PRIVATE;
-        String sign = OrderInfoUtil2_0.getSign(params, privateKey, rsa2);
-        final String orderInfo = orderParam + "&" + sign;
+//        boolean rsa2 = (RSA2_PRIVATE.length() > 0);
+//        Map<String, String> params = OrderInfoUtil2_0.buildOrderParamMap(APPID, rsa2);
+//        String orderParam = OrderInfoUtil2_0.buildOrderParam(params);
+//
+//        String privateKey = rsa2 ? d : RSA_PRIVATE;
+//        String sign = OrderInfoUtil2_0.getSign(params, privateKey, rsa2);
+//        final String orderInfo = orderParam + "&" + sign;
         return OrderInfoEt.getText().toString().trim();
     }
 

@@ -6,5 +6,5 @@ package com.yiba.pay;
 
 public interface IWxOrderInfo {
 
-    String getWxpayInfo();
+    WxPayInfo getWxpayInfo();
 }

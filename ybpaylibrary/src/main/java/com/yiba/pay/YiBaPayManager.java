@@ -1,12 +1,20 @@
 package com.yiba.pay;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 
 import com.alipay.sdk.app.PayTask;
+import com.tencent.mm.opensdk.modelpay.PayReq;
+import com.tencent.mm.opensdk.openapi.IWXAPI;
+import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 
 import java.util.Map;
 
@@ -24,6 +32,10 @@ public class YiBaPayManager {
     private IWxOrderInfo wxOrderInfo;
     private static IResultListener resultListener;
 
+    private static final String BROADCAST_PERMISSION_DISC = "com.yiba.permissions.YiBaPay";
+    public static final String ACTION = "com.yiba.pay.wxResult";
+    private IntentFilter filter;
+
 
     private static Handler handler = new Handler(YiBaPayConfig.getContext().getMainLooper()){
         @Override
@@ -40,17 +52,28 @@ public class YiBaPayManager {
                     if (TextUtils.equals(resultStatus, "9000")) {
                         // 该笔订单是否真实支付成功，需要依赖服务端的异步通知。
                        if (resultListener != null){
-                           resultListener.onSuccess();
+                           resultListener.onAliSuccess();
                        }
                     } else {
                         // 该笔订单真实的支付结果，需要依赖服务端的异步通知。
                         if (resultListener != null){
-                            resultListener.onFailed();
+                            resultListener.onAliFailed(Integer.parseInt(resultStatus.trim()));
                         }
                     }
                     break;
                 case WEIXIN_PAY:
-
+                    String code = (String) msg.obj;
+                    if ("0".equals(code)){
+                        // 该笔订单是否真实支付成功，需要依赖服务端的异步通知。
+                        if (resultListener != null){
+                            resultListener.onWxSuccess();
+                        }
+                    }else{
+                        // 该笔订单真实的支付结果，需要依赖服务端的异步通知。
+                        if (resultListener != null){
+                            resultListener.onWxFailed(Integer.parseInt(code.trim()));
+                        }
+                    }
 
                     break;
                 case STRIPE_PAY:
@@ -64,6 +87,9 @@ public class YiBaPayManager {
 
     private YiBaPayManager(){
 
+        filter = new IntentFilter();
+        filter.addAction(ACTION);
+        YiBaPayConfig.getContext().registerReceiver(wxPayResult,filter,BROADCAST_PERMISSION_DISC,null);
     }
 
     private static class SingleTonHolder{
@@ -94,23 +120,22 @@ public class YiBaPayManager {
      * 设置支付结果的回调
      * @param resultListener
      */
-    public void setResultListener(IResultListener resultListener){
+    public void setOnResultListener(IResultListener resultListener){
         this.resultListener  = resultListener;
     }
 
     /**
      * 支付宝支付
      */
-    public void  alipay(){
+    public void  aliPay(){
         if (aliOrderInfo == null){
-            throw new NullPointerException("aliOrderInfo  为商品信息不能为空，需要实现 IWxOrderInfo 接口 同时调用setOrderInfo方法");
+            throw new NullPointerException("aliOrderInfo  为商品信息不能为空，需要实现 IAliOrderInfo 接口 同时调用setOrderInfo方法");
         }
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
                 PayTask alipay = new PayTask((Activity) YiBaPayConfig.getContext());
                 Map<String, String> result = alipay.payV2(aliOrderInfo.getAlipayInfo(),true);
-
 
                 Message msg = handler.obtainMessage();
                 msg.what = ALI_PAY;
@@ -126,7 +151,21 @@ public class YiBaPayManager {
     /**
      * 微信支付
      */
-    public void wxpay(){
+    public void wxPay(){
+        if (wxOrderInfo == null){
+            throw new NullPointerException("wxOrderInfo  为商品信息不能为空，需要实现 IWxOrderInfo 接口 同时调用setOrderInfo方法");
+        }
+        IWXAPI msgApi = WXAPIFactory.createWXAPI(YiBaPayConfig.getContext(), null);
+        msgApi.registerApp(YiBaPayConfig.getWxAppId());
+        PayReq request = new PayReq();
+        request.appId = YiBaPayConfig.getWxAppId();
+        request.partnerId = wxOrderInfo.getWxpayInfo().partnerid;
+        request.prepayId = wxOrderInfo.getWxpayInfo().prepayid;
+        request.packageValue = "Sign=WXPay";
+        request.nonceStr = wxOrderInfo.getWxpayInfo().noncestr;
+        request.timeStamp = String.valueOf(wxOrderInfo.getWxpayInfo().timestamp);
+        request.sign = wxOrderInfo.getWxpayInfo().sign;
+        msgApi.sendReq(request);
 
     }
 
@@ -141,25 +180,60 @@ public class YiBaPayManager {
      * 这里随便传入一个布局
      * @param parent
      */
-    public void show(View parent){
+    public void show(View parent, final OnGenerateOrderCallback callback){
         final PayWindow payWindow = new PayWindow(YiBaPayConfig.getContext());
         payWindow.showAtLocation(parent);
         payWindow.setPayListener(new PayWindow.onPayListener() {
             @Override
             public void aliPay() {
-                alipay();
+                if (callback != null) {
+                    callback.generateAliOrder();
+                }
                 payWindow.dismiss();
             }
 
             @Override
             public void wxPay() {
-                wxpay();
+                if (callback != null) {
+                    callback.generateWxOrder();
+                }
+                payWindow.dismiss();
             }
 
             @Override
             public void stripePay() {
-                stripepay();
+                if (callback != null){
+                    callback.generateStripeOrder();
+                }
+                payWindow.dismiss();
             }
         });
     }
+
+    public interface OnGenerateOrderCallback{
+        void generateAliOrder();
+        void generateWxOrder();
+        void generateStripeOrder();
+    }
+
+    public BroadcastReceiver wxPayResult = new  BroadcastReceiver(){
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String code = intent.getStringExtra("code");
+            Message msg = handler.obtainMessage();
+            msg.what = WEIXIN_PAY;
+            msg.obj = code;
+            handler.sendMessage(msg);
+            Log.i("onPayFinish,errCode=","Code  =  " +code);
+        }
+    };
+
+    /**
+     * 广播销毁,这个方法在Activity销毁的时候需要调用。
+     */
+    public void broadDestory(){
+        YiBaPayConfig.getContext().unregisterReceiver(wxPayResult);
+    }
+
 }

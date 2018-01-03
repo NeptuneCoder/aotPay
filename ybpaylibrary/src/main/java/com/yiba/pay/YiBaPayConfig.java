@@ -9,6 +9,8 @@ import android.content.Context;
 public class YiBaPayConfig {
 
     public static Context mcontext;
+    public static String mWxAppId;
+
 
     public  static void setContext(Context context){
         mcontext = context;
@@ -21,5 +23,13 @@ public class YiBaPayConfig {
         }
 
         return mcontext;
+    }
+
+    public static void setWxAppId(String wxAppId){
+        mWxAppId = wxAppId ;
+    }
+
+    public static String getWxAppId(){
+        return mWxAppId;
     }
 }

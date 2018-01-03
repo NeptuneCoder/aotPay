@@ -6,7 +6,11 @@ package com.yiba.pay;
 
 public interface IResultListener {
 
-    void  onFailed();
+    void  onAliFailed(int code);
 
-    void onSuccess();
+    void onAliSuccess();
+
+    void  onWxFailed(int code);
+
+    void onWxSuccess();
 }
