@@ -10,6 +10,7 @@ public class YiBaPayConfig {
 
     public static Context mcontext;
     public static String mWxAppId;
+    public static String mGgAppId;
 
 
     public  static void setContext(Context context){
@@ -31,5 +32,13 @@ public class YiBaPayConfig {
 
     public static String getWxAppId(){
         return mWxAppId;
+    }
+
+    public static void setGgAppId(String ggAppId){
+        mGgAppId = ggAppId ;
+    }
+
+    public static String getGgAppId(){
+        return mGgAppId;
     }
 }

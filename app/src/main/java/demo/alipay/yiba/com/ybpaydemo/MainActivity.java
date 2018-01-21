@@ -1,15 +1,19 @@
 package demo.alipay.yiba.com.ybpaydemo;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.yiba.pay.IAliOrderInfo;
+import com.yiba.pay.IGooglePayResultListener;
 import com.yiba.pay.IResultListener;
 import com.yiba.pay.IWxOrderInfo;
+import com.yiba.pay.WxPayInfo;
 import com.yiba.pay.YiBaPayConfig;
 import com.yiba.pay.YiBaPayManager;
 
@@ -27,6 +31,8 @@ public class MainActivity extends AppCompatActivity implements IAliOrderInfo,IWx
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         YiBaPayConfig.setContext(this);
+        YiBaPayConfig.setGgAppId("MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApjWy+r9s6ncuh2l8OK59KrvySuTUQi5Zc1Sel/y2nVXh+7rEAVNV+Ndz75eJeT+mA3Y3uzRAfCuRR6lziyhE+5Jj330JtoWvi4SNJghVMSTs/uxK1B/Jg1GVUsYzC93QciBIEch22hCZWI93Gjq5UJ3OC5uy45YwIS4bYnjv2n7H37QSlfE1pzlNq8HktULpfD1lA6Sdc8NNRDl3c5OfUzIwYh6d2ErDjEa0EnIEksGBHlo3/zsgTwuG4Fm1DugNA/uQbvaps3tFSzc55afFWPuTtzVEVYqAvP2hJglklmmz0oZNWK8GYPg4iEeXlFWGSuWRT04zYVgJFj0LbJkGWQIDAQAB");
+        YiBaPayManager.getInstance().initGooglePay(this);
         final Button showPay = findViewById(R.id.showPay);
 
 
@@ -39,25 +45,60 @@ public class MainActivity extends AppCompatActivity implements IAliOrderInfo,IWx
         showPay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                YiBaPayManager.getInstance().GgBuyGoods(MainActivity.this,"vip_1_month");
 //                if (!OrderInfoEt.getText().toString().trim().isEmpty()){
-                    YiBaPayManager.getInstance().alipay();
+//
 //                }else{
-//                    Toast.makeText(MainActivity.this,"订单信息不能为空",0).show();
+//                    Toast.makeText(MainActivity.this,"订单信息不能为空",Toast.LENGTH_LONG).show();
 //                }
 
             }
         });
-        YiBaPayManager.getInstance().setResultListener(new IResultListener() {
+        YiBaPayManager.getInstance().setOnResultListener(new IResultListener() {
             @Override
-            public void onFailed() {
-                Toast.makeText(MainActivity.this,"支付失败",Toast.LENGTH_LONG).show();
+            public void onAliFailed(int i) {
+
             }
 
             @Override
-            public void onSuccess() {
-                Toast.makeText(MainActivity.this,"支付成功，走不通的逻辑",Toast.LENGTH_LONG).show();
+            public void onAliSuccess() {
+
             }
+
+            @Override
+            public void onGgFailed(int i) {
+
+            }
+
+            @Override
+            public void onGgSuccess(String result) {
+
+            }
+
+
+            @Override
+            public void onWxFailed(int i) {
+
+            }
+
+            @Override
+            public void onWxSuccess() {
+
+            }
+        });
+
+        YiBaPayManager.getInstance().setOnGoogleResultListener(new IGooglePayResultListener() {
+            @Override
+            public void onGgFailed(int code) {
+                    Toast.makeText(MainActivity.this,"code = "+ code,Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onGgSuccess(String result) {
+
+            }
+
+
         });
 
     }
@@ -81,8 +122,29 @@ public class MainActivity extends AppCompatActivity implements IAliOrderInfo,IWx
     }
 
     @Override
-    public String getWxpayInfo() {
-        return "";
+    public WxPayInfo getWxpayInfo() {
+        return null;
+    }
+
+
+
+//    @Override
+//    public String getWxpayInfo() {
+//        return "";
+//    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        YiBaPayManager.getInstance().bindCallBack(requestCode, resultCode, data);
+        super.onActivityResult(requestCode, resultCode, data);
+
+        Log.i("aCTIVITY requestCode","requestCode = "+ requestCode + "resultCode = "+ resultCode);
+    }
+
+    @Override
+    protected void onDestroy() {
+        YiBaPayManager.getInstance().DestoryQuote();
+        super.onDestroy();
     }
 }
 

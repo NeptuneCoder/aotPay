@@ -6,7 +6,10 @@
     android:orientation="vertical"
     android:layout_height="match_parent"
     tools:context="demo.alipay.yiba.com.ybpaydemo.MainActivity">
-
+    <FrameLayout
+        android:layout_width="1px"
+        android:id="@+id/v"
+        android:layout_height="1px"/>
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

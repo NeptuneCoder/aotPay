@@ -13,7 +13,7 @@ android {
         }
     }
     defaultConfig {
-        applicationId "demo.alipay.yiba.com.ybpaydemo"
+        applicationId "ggpay.yiba.com.ggpay"
         minSdkVersion rootProject.android.minSdkVersion
         targetSdkVersion rootProject.android.targetSdkVersion
         versionName rootProject.android.versionName
@@ -50,9 +50,11 @@ android {
 
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:26.1.0'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
-    implementation(name: "yibaPay-v2.5.3_2017-11-07-release", ext: 'aar')
+//    implementation(name: "yibaPay-v2.5.3_2018-01-17-release", ext: 'aar')
+    implementation(name: "ggpaylib-release", ext: 'aar')
+    implementation project(':ybpaylibrary')
 }
 

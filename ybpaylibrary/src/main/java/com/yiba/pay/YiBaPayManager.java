@@ -1,10 +1,14 @@
 package com.yiba.pay;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
@@ -16,7 +20,9 @@ import com.tencent.mm.opensdk.modelpay.PayReq;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 
+import java.util.List;
 import java.util.Map;
+
 
 
 /**
@@ -27,10 +33,13 @@ public class YiBaPayManager {
 
     private static final int ALI_PAY = 001;
     private static final int WEIXIN_PAY = 002;
-    private static final int STRIPE_PAY = 003;
+    public static final int GOOGLE_PAY = 003;
     private IAliOrderInfo aliOrderInfo;
     private IWxOrderInfo wxOrderInfo;
     private static IResultListener resultListener;
+    private static IAliResultListener aliResultListener;
+    private static IWxResultListener wxResultListener;
+    private static IGooglePayResultListener googleResultListener;
 
     private static final String BROADCAST_PERMISSION_DISC = "com.yiba.permissions.YiBaPay";
     public static final String ACTION = "com.yiba.pay.wxResult";
@@ -53,11 +62,18 @@ public class YiBaPayManager {
                         // 该笔订单是否真实支付成功，需要依赖服务端的异步通知。
                        if (resultListener != null){
                            resultListener.onAliSuccess();
+
+                       }
+                       if (aliResultListener!=null){
+                           aliResultListener.onAliSuccess();
                        }
                     } else {
                         // 该笔订单真实的支付结果，需要依赖服务端的异步通知。
                         if (resultListener != null){
                             resultListener.onAliFailed(Integer.parseInt(resultStatus.trim()));
+                        }
+                        if (aliResultListener!=null){
+                            aliResultListener.onAliFailed(Integer.parseInt(resultStatus.trim()));
                         }
                     }
                     break;
@@ -68,15 +84,46 @@ public class YiBaPayManager {
                         if (resultListener != null){
                             resultListener.onWxSuccess();
                         }
+                        if (wxResultListener!=null){
+                            wxResultListener.onWxSuccess();
+                        }
                     }else{
                         // 该笔订单真实的支付结果，需要依赖服务端的异步通知。
                         if (resultListener != null){
                             resultListener.onWxFailed(Integer.parseInt(code.trim()));
                         }
+                        if (wxResultListener!=null){
+                            wxResultListener.onWxFailed(Integer.parseInt(code.trim()));
+                        }
                     }
 
                     break;
-                case STRIPE_PAY:
+                case GOOGLE_PAY:
+                    if (msg.obj instanceof Integer){
+                        int  ggCode = (int) msg.obj;
+                        if (ggCode == IGooglePayResultListener.INIT_FAILED){
+                            // 该笔订单真实的支付结果，需要依赖服务端的异步通知。
+                            if (resultListener != null){
+                                resultListener.onGgFailed(IGooglePayResultListener.INIT_FAILED);
+                            }
+                            if (googleResultListener!=null){
+                                googleResultListener.onGgFailed(IGooglePayResultListener.INIT_FAILED);
+                            }
+                        }else if (ggCode == IGooglePayResultListener.UN_LOGIN){
+                            // 该笔订单真实的支付结果，需要依赖服务端的异步通知。
+                            if (resultListener != null){
+                                resultListener.onGgFailed(IGooglePayResultListener.UN_LOGIN);
+                            }
+                            if (googleResultListener!=null){
+                                googleResultListener.onGgFailed(IGooglePayResultListener.UN_LOGIN);
+                            }
+                        }
+                    } else if (msg.obj instanceof String){
+                        String result = (String) msg.obj;
+                        if (googleResultListener!=null){
+                            googleResultListener.onGgSuccess(result);
+                        }
+                    }
 
                     break;
             }
@@ -86,7 +133,9 @@ public class YiBaPayManager {
 
 
     private YiBaPayManager(){
-
+        //初始化googepay
+    }
+    public void initWxCallback(){
         filter = new IntentFilter();
         filter.addAction(ACTION);
         YiBaPayConfig.getContext().registerReceiver(wxPayResult,filter,BROADCAST_PERMISSION_DISC,null);
@@ -122,6 +171,14 @@ public class YiBaPayManager {
      */
     public void setOnResultListener(IResultListener resultListener){
         this.resultListener  = resultListener;
+    }
+
+    /**
+     * 设置支付结果的回调
+     * @param resultListener
+     */
+    public void setOnGoogleResultListener(IGooglePayResultListener resultListener){
+        this.googleResultListener  = resultListener;
     }
 
     /**
@@ -169,12 +226,7 @@ public class YiBaPayManager {
 
     }
 
-    /**
-     * stripe 支付
-     */
-    public void stripepay(){
 
-    }
 
     /**
      * 这里随便传入一个布局
@@ -228,12 +280,60 @@ public class YiBaPayManager {
             Log.i("onPayFinish,errCode=","Code  =  " +code);
         }
     };
+    private GooglePay googlePay;
 
+    public void initGooglePay(Activity activity){
+        googlePay = new GooglePay(activity, YiBaPayConfig.getGgAppId(),handler);
+    }
+    public void  GgBuyGoods(Activity activity,String productId){
+        if (googlePay!=null){
+            googlePay.buyGoods(activity,productId,activity.getPackageName(),"");
+        }else{
+            Log.i("tag","please init google pay");
+        }
+
+    }
+    private void unRegisterGoogleBroadCast(){
+        if (googlePay!=null){
+            googlePay.unRegister();
+            googlePay.OnDispose();
+        }
+    }
+
+
+    /**
+     * 销毁引用
+     */
+    public void DestoryQuote(){
+        unRegisterWxBroadCast();
+        unRegisterGoogleBroadCast();
+        googleResultListener = null;
+        aliResultListener = null;
+        wxResultListener = null;
+
+    }
     /**
      * 广播销毁,这个方法在Activity销毁的时候需要调用。
      */
-    public void broadDestory(){
-        YiBaPayConfig.getContext().unregisterReceiver(wxPayResult);
+    private void unRegisterWxBroadCast(){
+        if (wxPayResult!=null){
+            PackageManager pm = YiBaPayConfig.getContext().getPackageManager();
+            Intent intent = new Intent(ACTION);
+            List<ResolveInfo> list =  pm.queryBroadcastReceivers(intent,0);
+            if (list!=null && !list.isEmpty()){
+                YiBaPayConfig.getContext().unregisterReceiver(wxPayResult);
+            }
+        }
     }
 
+
+    public boolean bindCallBack(int requestCode, int resultCode, Intent data){
+        if (googlePay!=null){
+          return   googlePay.bindCallBack(requestCode,resultCode,data);
+        }
+        return false;
+    }
+
+
 }
+
