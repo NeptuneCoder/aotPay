@@ -1,8 +1,6 @@
 package com.yiba.pay;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -116,6 +114,14 @@ public class YiBaPayManager {
                             }
                             if (googleResultListener!=null){
                                 googleResultListener.onGgFailed(IGooglePayResultListener.UN_LOGIN);
+                            }
+                        }else{
+                            // 该笔订单真实的支付结果，需要依赖服务端的异步通知。
+                            if (resultListener != null){
+                                resultListener.onGgFailed(ggCode);
+                            }
+                            if (googleResultListener!=null){
+                                googleResultListener.onGgFailed(ggCode);
                             }
                         }
                     } else if (msg.obj instanceof String){
@@ -298,6 +304,7 @@ public class YiBaPayManager {
             googlePay.unRegister();
             googlePay.OnDispose();
         }
+
     }
 
 
@@ -310,6 +317,9 @@ public class YiBaPayManager {
         googleResultListener = null;
         aliResultListener = null;
         wxResultListener = null;
+        YiBaPayConfig.setContext(null);
+        YiBaPayConfig.setWxAppId(null);
+        YiBaPayConfig.setGgAppId(null);
 
     }
     /**

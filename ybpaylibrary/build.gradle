@@ -43,6 +43,7 @@ dependencies {
     implementation files('libs/alipaySdk-20170922.jar')
     implementation 'com.tencent.mm.opensdk:wechat-sdk-android-without-mta:1.0.2'
     implementation(name: "ggpaylib-release", ext: 'aar')
+
 //    //stripe支付的依赖
 //    implementation 'com.stripe:stripe-android:5.1.0'
 //
