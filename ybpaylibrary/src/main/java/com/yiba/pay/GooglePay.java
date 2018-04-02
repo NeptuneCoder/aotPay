@@ -15,7 +15,10 @@ import com.google.pay.IabHelper;
 import com.google.pay.IabResult;
 import com.google.pay.Inventory;
 import com.google.pay.Purchase;
+import com.google.pay.Security;
 import com.google.pay.UnLoginException;
+
+import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,8 +26,7 @@ import java.util.List;
 
 /**
  * Created by yh on 2018/1/17.
- *  // IAB Helper error codes
-
+ * // IAB Helper error codes
  */
 
 public class GooglePay {
@@ -46,15 +48,18 @@ public class GooglePay {
     //标记广播是否注册成功，用于反注册判断
     private boolean isRegisterStatus = false;
     private Activity activity;
+    private String base64;
 
-    public  GooglePay(final Activity activity, String base64,Handler handler){
+    public GooglePay(final Activity activity, String base64, Handler handler) {
         this.handler = handler;
-        GgPayInit(activity,base64);
+        GgPayInit(activity, base64);
     }
+
     private IabHelper mHelper = null;
     IabBroadcastReceiver mBroadcastReceiver;
 
-    public void GgPayInit(final Activity activity, String base64){
+    public void GgPayInit(final Activity activity, String base64) {
+        this.base64 = base64;
         this.activity = activity;
         // Some sanity checks to see if the developer (that's you!) really followed the
         // instructions to run this sample (don't put these checks on your app!)
@@ -69,57 +74,80 @@ public class GooglePay {
         // enable debug logging (for a production application, you should set this to false).
 
 
-       try {
-           mHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
-               public void onIabSetupFinished(IabResult result) {
+        try {
+            mHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
+                public void onIabSetupFinished(IabResult result) {
 
-                   if (!result.isSuccess()) {
-                       // Oh noes, there was a problem.
-                       if (handler!=null){
-                           Message msg = handler.obtainMessage();
-                           msg.what =YiBaPayManager.GOOGLE_PAY;
-                           msg.obj = IGooglePayResultListener.INIT_FAILED;
-                           handler.sendMessage(msg);
-                       }
+                    if (!result.isSuccess()) {
+                        // Oh noes, there was a problem.
+                        if (handler != null) {
+                            Message msg = handler.obtainMessage();
+                            msg.what = YiBaPayManager.GOOGLE_PAY;
+                            msg.obj = IGooglePayResultListener.INIT_FAILED;
+                            handler.sendMessage(msg);
+                        }
+                        return;
+                    }
+                    try {
+                        mHelper.queryInventoryAsync(mGotInventoryListener);
+                    } catch (IabHelper.IabAsyncInProgressException e) {
+                        e.printStackTrace();
+                    }
 
-                       //TODO 错误提示
-                       return;
-                   }
+                    // Important: Dynamically register for broadcast messages about updated purchases.
+                    // We register the receiver here instead of as a <receiver> in the Manifest
+                    // because we always call getPurchases() at startup, so therefore we can ignore
+                    // any broadcasts sent while the app isn't running.
+                    // Note: registering this listener in an Activity is a bad idea, but is done here
+                    // because this is a SAMPLE. Regardless, the receiver must be registered after
+                    // IabHelper is setup, but before first call to getPurchases().
+
+                    mBroadcastReceiver = new IabBroadcastReceiver(InitSuccessCallback);
+                    IntentFilter broadcastFilter = new IntentFilter(IabBroadcastReceiver.ACTION);
+                    activity.registerReceiver(mBroadcastReceiver, broadcastFilter);
 
 
-                   try {
-                       mHelper.queryInventoryAsync(mGotInventoryListener);
-                   } catch (IabHelper.IabAsyncInProgressException e) {
-                       e.printStackTrace();
-                   }
+                    // IAB is fully set up. Now, let's get an inventory of stuff we own.
+                    try {
+                        mHelper.queryInventoryAsync(mGotInventoryListener);
+                    } catch (IabHelper.IabAsyncInProgressException e) {
+//                       complain("Error querying inventory. Another async operation in progress.");
+                    }
+                }
 
-                   // Important: Dynamically register for broadcast messages about updated purchases.
-                   // We register the receiver here instead of as a <receiver> in the Manifest
-                   // because we always call getPurchases() at startup, so therefore we can ignore
-                   // any broadcasts sent while the app isn't running.
-                   // Note: registering this listener in an Activity is a bad idea, but is done here
-                   // because this is a SAMPLE. Regardless, the receiver must be registered after
-                   // IabHelper is setup, but before first call to getPurchases().
+                @Override
+                public void onPayStatus(int result) {
+                    if (handler != null) {
+                        Message msg = handler.obtainMessage();
+                        msg.what = YiBaPayManager.GOOGLE_PAY;
+                        msg.obj = result;
+                        handler.sendMessage(msg);
+                    }
+                }
 
-                   mBroadcastReceiver = new IabBroadcastReceiver(InitSuccessCallback);
-                   IntentFilter broadcastFilter = new IntentFilter(IabBroadcastReceiver.ACTION);
-                   activity.registerReceiver(mBroadcastReceiver, broadcastFilter);
-
-               }
-           });
-       }catch (Exception e){
-           if (handler!=null){
-               Message msg = handler.obtainMessage();
-               msg.what =YiBaPayManager.GOOGLE_PAY;
-               msg.obj = IGooglePayResultListener.INIT_SERVICE_FAILED;
-               handler.sendMessage(msg);
-           }
-       }
+                @Override
+                public void onConsumedStatus(int result) {
+                    if (handler != null) {
+                        Message msg = handler.obtainMessage();
+                        msg.what = YiBaPayManager.GOOGLE_PAY;
+                        msg.obj = result;
+                        handler.sendMessage(msg);
+                    }
+                }
+            });
+        } catch (Exception e) {
+            if (handler != null) {
+                Message msg = handler.obtainMessage();
+                msg.what = YiBaPayManager.GOOGLE_PAY;
+                msg.obj = IGooglePayResultListener.INIT_SERVICE_FAILED;
+                handler.sendMessage(msg);
+            }
+        }
     }
 
 
     //初始化google支付时需要的广播，目的是为了接受初始化成功后，去查询结果。
-    private IabBroadcastReceiver.IabBroadcastListener InitSuccessCallback = new IabBroadcastReceiver.IabBroadcastListener(){
+    private IabBroadcastReceiver.IabBroadcastListener InitSuccessCallback = new IabBroadcastReceiver.IabBroadcastListener() {
 
         @Override
         public void receivedBroadcast() {
@@ -143,31 +171,10 @@ public class GooglePay {
              * 这就是为什么我们必须调用consumeAsync（）方法。当我们购买物品时，
              * Google Play商店保留记录物品一次性购买，并允许您第二次购买。
              */
-//            Purchase gasPurchase0 = inventory.getPurchase("svip_6_month");
-//            Purchase gasPurchase1= inventory.getPurchase("svip_3_month");
-//            Purchase gasPurchase2 = inventory.getPurchase("svip_1_month");
-//            Purchase gasPurchase3 = inventory.getPurchase("svip_12_month");
-            if (result.isSuccess()){
-                consumeAsyncProduct(result,inventory);
+            if (result.isSuccess()) {
+                consumeAsyncProduct(result, inventory);
             }
 
-//            Log.i("gasPurchase",String.valueOf(inventory == null));
-//            Log.i("gasPurchase",String.valueOf(result == null));
-//            if (gasPurchase1 != null ) {
-//                try {
-//                    mHelper.consumeAsync(gasPurchase1,
-//                            null);
-//                } catch (IabHelper.IabAsyncInProgressException e) {
-//                    e.printStackTrace();
-//                    if (handler!=null){
-//                        Message msg = handler.obtainMessage();
-//                        msg.what =YiBaPayManager.GOOGLE_PAY;
-//                        msg.obj = IGooglePayResultListener.CONFIRM_INVENTORY_FAILURE;
-//                        handler.sendMessage(msg);
-//                    }
-//                }
-//                return;
-//            }
 
             /*
              * Check for items we own. Notice that for each purchase, we check
@@ -178,7 +185,7 @@ public class GooglePay {
         }
     };
 
-    public List<String >  getGoodsName(){
+    public List<String> getGoodsName() {
         List<String> result = new ArrayList<>();
         result.add("vip_1_month");
         result.add("vip_3_month");
@@ -192,14 +199,14 @@ public class GooglePay {
         return result;
     }
 
-    public void consumeAsyncProduct(IabResult result, Inventory inventory){
+    public void consumeAsyncProduct(IabResult result, Inventory inventory) {
         boolean isHaveErr = false;
-        for (String item:getGoodsName()){
-            Purchase gasPurchase1= inventory.getPurchase(item);
-            if (gasPurchase1 != null ) {
+        for (String item : getGoodsName()) {
+            Purchase gasPurchase1 = inventory.getPurchase(item);
+            if (gasPurchase1 != null) {
                 try {
                     mHelper.consumeAsync(gasPurchase1,
-                            null);
+                            mConsumeFinishedListener);
                 } catch (IabHelper.IabAsyncInProgressException e) {
                     e.printStackTrace();
 
@@ -207,43 +214,46 @@ public class GooglePay {
                 }
             }
         }
-        if (handler!=null && isHaveErr){
+        if (handler != null && isHaveErr) {
             Message msg = handler.obtainMessage();
-            msg.what =YiBaPayManager.GOOGLE_PAY;
+            msg.what = YiBaPayManager.GOOGLE_PAY;
             msg.obj = IGooglePayResultListener.CONFIRM_INVENTORY_FAILURE;
             handler.sendMessage(msg);
         }
     }
-    public void unRegister(){
-            if (isRegisterStatus){
-                PackageManager pm = YiBaPayConfig.getContext().getPackageManager();
-                Intent intent = new Intent(IabBroadcastReceiver.ACTION);
-                List<ResolveInfo> list =  pm.queryBroadcastReceivers(intent,0);
-                if (list!=null && !list.isEmpty()){
-                    activity.unregisterReceiver(mBroadcastReceiver);
-                }
-                isRegisterStatus = false;
+
+    public void unRegister() {
+        if (isRegisterStatus) {
+            PackageManager pm = YiBaPayConfig.getContext().getPackageManager();
+            Intent intent = new Intent(IabBroadcastReceiver.ACTION);
+            List<ResolveInfo> list = pm.queryBroadcastReceivers(intent, 0);
+            if (list != null && !list.isEmpty()) {
+                activity.unregisterReceiver(mBroadcastReceiver);
             }
+            isRegisterStatus = false;
+        }
     }
+
     private String sku = "svip_6_month";
-    public void buyGoods(final Activity activity,final String sku,final String packageName,final String developerPayload) {
+
+    public void buyGoods(final Activity activity, final String sku, final String packageName, final String developerPayload) {
         this.sku = sku;
         try {
-            if (mHelper !=null){
-//                mHelper.buyGoods(activity,sku,packageName,developerPayload);
+            if (mHelper != null) {
                 try {
-                    mHelper.launchPurchaseFlow(activity,sku,1001,mPurchaseFinishedListener,developerPayload);
+                    mHelper.launchPurchaseFlow(activity, sku, 1001, mPurchaseFinishedListener, developerPayload);
                 } catch (IabHelper.IabAsyncInProgressException e) {
                     e.printStackTrace();
                 }
             }
-        }catch (UnLoginException e){
+        } catch (UnLoginException e) {
             sendErrorMsg(IGooglePayResultListener.UN_LOGIN);
         }
 
     }
-    private void sendErrorMsg(int obj){
-        if (handler!=null){
+
+    private void sendErrorMsg(int obj) {
+        if (handler != null) {
             Message msg = handler.obtainMessage();
             msg.what = YiBaPayManager.GOOGLE_PAY;
             msg.obj = obj;
@@ -266,32 +276,87 @@ public class GooglePay {
             // bought 1/4 tank of gas. So consume it.
             if (purchase.getSku().equals(sku)) {
                 try {
-                    Log.i("tag","is  in there");
-                    mHelper.consumeAsync(purchase, null);//后面这个回调在源码中没有做事情，所以没有设置为null
+                    Log.i("tag", "is  in there");
+                    mHelper.consumeAsync(purchase, mConsumeFinishedListener);//后面这个回调在源码中没有做事情，所以没有设置为null
                 } catch (IabHelper.IabAsyncInProgressException e) {
-                    sendErrorMsg(IGooglePayResultListener.UN_LOGIN);
+                    sendErrorMsg(IGooglePayResultListener.NO_SPECIFIED_ITEM);
                     return;
                 }
             }
-
-
         }
     };
+
+    // Called when consumption is complete
+    IabHelper.OnConsumeFinishedListener mConsumeFinishedListener = new IabHelper.OnConsumeFinishedListener() {
+        public void onConsumeFinished(Purchase purchase, IabResult result) {
+
+            // if we were disposed of in the meantime, quit.
+            if (mHelper == null) return;
+
+            // We know this is the "gas" sku because it's the only one we consume,
+            // so we don't check which sku was consumed. If you have more than one
+            // sku, you probably should check...
+            if (result.isSuccess()) {
+                // successfully consumed, so we apply the effects of the item in our
+                // game world's logic, which in our case means filling the gas tank a bit
+                //TODO 消耗成功
+            } else {
+
+            }
+        }
+    };
+
+    public class OrderParam {
+        String purchaseData;
+        String dataSignature;
+        int responseCode;
+        int resultCode;
+    }
+
     public boolean bindCallBack(int requestCode, int resultCode, Intent data) {
         if (mHelper == null) return false;
         Message msg = handler.obtainMessage();
 
-        if (requestCode == 1001) {
-            if (data  !=null){
-                if (resultCode == Activity.RESULT_OK) {
-                    int responseCode = data.getIntExtra("RESPONSE_CODE", 0);
-                    String purchaseData = data.getStringExtra("INAPP_PURCHASE_DATA");
-                    String dataSignature = data.getStringExtra("INAPP_DATA_SIGNATURE");
+        if (data != null) {
+            if (resultCode == Activity.RESULT_OK && requestCode == 1001) {
+                int responseCode = data.getIntExtra("RESPONSE_CODE", 0);
+                String purchaseData = data.getStringExtra("INAPP_PURCHASE_DATA");
+                String dataSignature = data.getStringExtra("INAPP_DATA_SIGNATURE");
 
-                    msg.what = YiBaPayManager.GOOGLE_PAY;
-                    msg.obj =purchaseData;
-                    handler.sendMessage(msg);
+                Purchase purchase = null;
+                try {
+                    purchase = new Purchase(sku, purchaseData, dataSignature);
+                    String sku = purchase.getSku();
+
+                    // Verify signature
+                    if (!Security.verifyPurchase(base64, purchaseData, dataSignature)) {
+//                        result = new IabResult(IABHELPER_VERIFICATION_FAILED, "Signature verification failed for sku " + sku);
+//                        if (mPurchaseListener != null) mPurchaseListener.onIabPurchaseFinished(result, purchase);
+                        return true;
+                    }
                 }
+                catch (JSONException e) {
+                    e.printStackTrace();
+//                    result = new IabResult(IABHELPER_BAD_RESPONSE, "Failed to parse purchase data.");
+//                    if (mPurchaseListener != null) mPurchaseListener.onIabPurchaseFinished(result, null);
+                    return true;
+                }
+
+//                if (mPurchaseListener != null) {
+//                    mPurchaseListener.onIabPurchaseFinished(new IabResult(IabHelper.BILLING_RESPONSE_RESULT_OK, "Success"), purchase);
+//                }
+
+                OrderParam param = new OrderParam();
+                param.purchaseData = purchaseData;
+                param.dataSignature = dataSignature;
+                param.purchaseData = purchaseData;
+                param.responseCode = responseCode;
+                param.resultCode = resultCode;
+                msg.what = YiBaPayManager.GOOGLE_PAY;
+                msg.obj = param;
+                handler.sendMessage(msg);
+
+
             }
         }
         // Pass on the activity result to the helper for handling
@@ -305,7 +370,7 @@ public class GooglePay {
         return false;
     }
 
-    public void OnDispose(){
+    public void OnDispose() {
         if (mHelper != null) {
             mHelper.disposeWhenFinished();
         }

@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Handler;
 import android.os.Message;
+import android.test.suitebuilder.annotation.Suppress;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -124,10 +125,10 @@ public class YiBaPayManager {
                                 googleResultListener.onGgFailed(ggCode);
                             }
                         }
-                    } else if (msg.obj instanceof String){
-                        String result = (String) msg.obj;
+                    } else if (msg.obj instanceof GooglePay.OrderParam){
+                        GooglePay.OrderParam result = (GooglePay.OrderParam) msg.obj;
                         if (googleResultListener!=null){
-                            googleResultListener.onGgSuccess(result);
+                            googleResultListener.onGgSuccess(result.resultCode,result.responseCode,result.dataSignature,result.purchaseData);
                         }
                     }
 
@@ -291,6 +292,15 @@ public class YiBaPayManager {
     public void initGooglePay(Activity activity){
         googlePay = new GooglePay(activity, YiBaPayConfig.getGgAppId(),handler);
     }
+    public void  GgBuyGoods(Activity activity,String productId,String developerPayload){
+        if (googlePay!=null){
+            googlePay.buyGoods(activity,productId,activity.getPackageName(),developerPayload);
+        }else{
+            Log.i("tag","please init google pay");
+        }
+
+    }
+    @Deprecated
     public void  GgBuyGoods(Activity activity,String productId){
         if (googlePay!=null){
             googlePay.buyGoods(activity,productId,activity.getPackageName(),"");
