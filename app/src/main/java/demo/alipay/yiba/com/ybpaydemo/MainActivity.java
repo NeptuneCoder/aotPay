@@ -9,6 +9,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.pay.RandomString;
+import com.yiba.pay.GooglePay;
 import com.yiba.pay.IAliOrderInfo;
 import com.yiba.pay.IGooglePayResultListener;
 import com.yiba.pay.IResultListener;
@@ -47,13 +49,15 @@ public class MainActivity extends AppCompatActivity implements IAliOrderInfo, IW
         showPay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                YiBaPayManager.getInstance().GgBuyGoods(MainActivity.this, "vip_1_month");
-//                if (!OrderInfoEt.getText().toString().trim().isEmpty()){
-//
-//                }else{
-//                    Toast.makeText(MainActivity.this,"订单信息不能为空",Toast.LENGTH_LONG).show();
-//                }
+//                YiBaPayManager.getInstance().GgBuyGoods(MainActivity.this, "vip_1_month");
+////                if (!OrderInfoEt.getText().toString().trim().isEmpty()){
+////
+////                }else{
+////                    Toast.makeText(MainActivity.this,"订单信息不能为空",Toast.LENGTH_LONG).show();
+////                }
+                RandomString randomString = new RandomString(36);
 
+                YiBaPayManager.getInstance().subsGood(MainActivity.this, "svip_1_month", randomString.nextString().toString());
             }
         });
         YiBaPayManager.getInstance().setOnResultListener(new IResultListener() {
@@ -73,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements IAliOrderInfo, IW
             }
 
             @Override
-            public void onGgSuccess(int resultCode, int responseCode, String dataSignature, String purchaseData) {
+            public void onGgSuccess(GooglePay.OrderParam data) {
 
             }
 
@@ -96,9 +100,11 @@ public class MainActivity extends AppCompatActivity implements IAliOrderInfo, IW
             }
 
             @Override
-            public void onGgSuccess(int resultCode, int responseCode, String dataSignature, String purchaseData) {
-
+            public void onGgSuccess(GooglePay.OrderParam data) {
+                Log.i("tag", "");
             }
+
+
         });
 
     }

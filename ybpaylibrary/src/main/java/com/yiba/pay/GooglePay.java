@@ -31,6 +31,7 @@ import java.util.List;
 
 public class GooglePay {
 
+    private String currBuyType = "";
     public static final int IABHELPER_ERROR_BASE = -1000;
     public static final int IABHELPER_REMOTE_EXCEPTION = -1001;
     public static final int IABHELPER_BAD_RESPONSE = -1002;
@@ -172,7 +173,9 @@ public class GooglePay {
              * Google Play商店保留记录物品一次性购买，并允许您第二次购买。
              */
             if (result.isSuccess()) {
-                consumeAsyncProduct(result, inventory);
+                if (currBuyType.equals(IabHelper.ITEM_TYPE_INAPP)) {
+                    consumeAsyncProduct(result, inventory);
+                }
             }
 
 
@@ -236,8 +239,9 @@ public class GooglePay {
 
     private String sku = "svip_6_month";
 
-    public void buyGoods(final Activity activity, final String sku, final String packageName, final String developerPayload) {
+    public void buyGoods(final Activity activity, final String sku, final String developerPayload) {
         this.sku = sku;
+        this.currBuyType = IabHelper.ITEM_TYPE_INAPP;
         try {
             if (mHelper != null) {
                 try {
@@ -250,6 +254,22 @@ public class GooglePay {
             sendErrorMsg(IGooglePayResultListener.UN_LOGIN);
         }
 
+    }
+
+    public void launchSubscriptionPurchaseFlow(final Activity activity, final String sku, final String developerPayload) {
+        this.sku = sku;
+        this.currBuyType = IabHelper.ITEM_TYPE_SUBS;
+        try {
+            if (mHelper != null) {
+                try {
+                    mHelper.launchSubscriptionPurchaseFlow(activity, sku, 1001, mPurchaseFinishedListener, developerPayload);
+                } catch (IabHelper.IabAsyncInProgressException e) {
+                    e.printStackTrace();
+                }
+            }
+        } catch (UnLoginException e) {
+            sendErrorMsg(IGooglePayResultListener.UN_LOGIN);
+        }
     }
 
     private void sendErrorMsg(int obj) {
@@ -274,7 +294,7 @@ public class GooglePay {
                 return;
             }
             // bought 1/4 tank of gas. So consume it.
-            if (purchase.getSku().equals(sku)) {
+            if (purchase.getSku().equals(sku)) {//购买成功后，消耗商品
                 try {
                     Log.i("tag", "is  in there");
                     mHelper.consumeAsync(purchase, mConsumeFinishedListener);//后面这个回调在源码中没有做事情，所以没有设置为null
@@ -307,10 +327,25 @@ public class GooglePay {
     };
 
     public class OrderParam {
-        String purchaseData;
-        String dataSignature;
-        int responseCode;
-        int resultCode;
+        public String purchaseData;
+        public String dataSignature;
+        public int responseCode;
+        public int resultCode;
+        public String currBuyType; // 表示当前是内购还是订阅：// Item types
+//        IabHelper
+//        public static final String ITEM_TYPE_INAPP = "inapp";
+//        public static final String ITEM_TYPE_SUBS = "subs";
+
+        @Override
+        public String toString() {
+            return "{" +
+                    "purchaseData:'" + purchaseData + '\'' +
+                    ", dataSignature:'" + dataSignature + '\'' +
+                    ", responseCode:" + responseCode +
+                    ", resultCode=" + resultCode +
+                    ", currBuyType:'" + currBuyType + '\'' +
+                    '}';
+        }
     }
 
     public boolean bindCallBack(int requestCode, int resultCode, Intent data) {
@@ -334,8 +369,7 @@ public class GooglePay {
 //                        if (mPurchaseListener != null) mPurchaseListener.onIabPurchaseFinished(result, purchase);
                         return true;
                     }
-                }
-                catch (JSONException e) {
+                } catch (JSONException e) {
                     e.printStackTrace();
 //                    result = new IabResult(IABHELPER_BAD_RESPONSE, "Failed to parse purchase data.");
 //                    if (mPurchaseListener != null) mPurchaseListener.onIabPurchaseFinished(result, null);
@@ -352,6 +386,7 @@ public class GooglePay {
                 param.purchaseData = purchaseData;
                 param.responseCode = responseCode;
                 param.resultCode = resultCode;
+                param.currBuyType = currBuyType;
                 msg.what = YiBaPayManager.GOOGLE_PAY;
                 msg.obj = param;
                 handler.sendMessage(msg);

@@ -128,7 +128,7 @@ public class YiBaPayManager {
                     } else if (msg.obj instanceof GooglePay.OrderParam){
                         GooglePay.OrderParam result = (GooglePay.OrderParam) msg.obj;
                         if (googleResultListener!=null){
-                            googleResultListener.onGgSuccess(result.resultCode,result.responseCode,result.dataSignature,result.purchaseData);
+                            googleResultListener.onGgSuccess(result);
                         }
                     }
 
@@ -292,18 +292,29 @@ public class YiBaPayManager {
     public void initGooglePay(Activity activity){
         googlePay = new GooglePay(activity, YiBaPayConfig.getGgAppId(),handler);
     }
-    public void  GgBuyGoods(Activity activity,String productId,String developerPayload){
+
+    public void  subsGood(Activity activity,String productId,String developerPayload){
         if (googlePay!=null){
-            googlePay.buyGoods(activity,productId,activity.getPackageName(),developerPayload);
+            googlePay.launchSubscriptionPurchaseFlow(activity,productId,developerPayload);
         }else{
             Log.i("tag","please init google pay");
         }
 
     }
+    public void  GgBuyGoods(Activity activity,String productId,String developerPayload){
+        if (googlePay!=null){
+            googlePay.buyGoods(activity,productId,developerPayload);
+        }else{
+            Log.i("tag","please init google pay");
+        }
+
+    }
+
+
     @Deprecated
     public void  GgBuyGoods(Activity activity,String productId){
         if (googlePay!=null){
-            googlePay.buyGoods(activity,productId,activity.getPackageName(),"");
+            googlePay.buyGoods(activity,productId,"");
         }else{
             Log.i("tag","please init google pay");
         }

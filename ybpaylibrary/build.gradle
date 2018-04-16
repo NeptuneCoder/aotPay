@@ -42,7 +42,6 @@ dependencies {
 //    implementation 'com.tencent.mm.opensdk:wechat-sdk-android-without-mta:+'
     implementation files('libs/alipaySdk-20170922.jar')
     implementation 'com.tencent.mm.opensdk:wechat-sdk-android-without-mta:1.0.2'
-    
 
 //    //stripe支付的依赖
 //    implementation 'com.stripe:stripe-android:5.1.0'

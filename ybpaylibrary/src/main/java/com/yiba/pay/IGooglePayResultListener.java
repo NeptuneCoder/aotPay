@@ -26,5 +26,5 @@ public interface IGooglePayResultListener {
 
     void onGgFailed(int code);
 
-    void onGgSuccess(int resultCode,int responseCode, String dataSignature, String purchaseData);
+    void onGgSuccess(GooglePay.OrderParam data);
 }
