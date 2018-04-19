@@ -38,15 +38,31 @@ public class MainActivity extends AppCompatActivity implements IAliOrderInfo, IW
         YiBaPayConfig.setContext(this);
         YiBaPayConfig.setGgAppId("MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApjWy+r9s6ncuh2l8OK59KrvySuTUQi5Zc1Sel/y2nVXh+7rEAVNV+Ndz75eJeT+mA3Y3uzRAfCuRR6lziyhE+5Jj330JtoWvi4SNJghVMSTs/uxK1B/Jg1GVUsYzC93QciBIEch22hCZWI93Gjq5UJ3OC5uy45YwIS4bYnjv2n7H37QSlfE1pzlNq8HktULpfD1lA6Sdc8NNRDl3c5OfUzIwYh6d2ErDjEa0EnIEksGBHlo3/zsgTwuG4Fm1DugNA/uQbvaps3tFSzc55afFWPuTtzVEVYqAvP2hJglklmmz0oZNWK8GYPg4iEeXlFWGSuWRT04zYVgJFj0LbJkGWQIDAQAB");
         YiBaPayManager.getInstance().initGooglePay(this);
-        final Button showPay = findViewById(R.id.showPay);
 
 
         OrderInfoEt = findViewById(R.id.et);
         YiBaPayManager.getInstance().setAliOrderInfo(this);
         YiBaPayManager.getInstance().setWxOrderInfo(this);
 
+        findViewById(R.id.google_pay_subs).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                RandomString randomString = new RandomString(36);
+                YiBaPayManager.getInstance().subsGood(MainActivity.this, "svip_1_month", randomString.nextString().toString());
+            }
+        });
 
-        showPay.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.google_pay_inapp).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                RandomString randomString = new RandomString(36);
+
+                YiBaPayManager.getInstance().GgBuyGoods(MainActivity.this, "vip_1_month", randomString.nextString().toString());
+            }
+        });
+
+
+        findViewById(R.id.select_Pay).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 //                YiBaPayManager.getInstance().GgBuyGoods(MainActivity.this, "vip_1_month");
@@ -55,9 +71,22 @@ public class MainActivity extends AppCompatActivity implements IAliOrderInfo, IW
 ////                }else{
 ////                    Toast.makeText(MainActivity.this,"订单信息不能为空",Toast.LENGTH_LONG).show();
 ////                }
-                RandomString randomString = new RandomString(36);
+                YiBaPayManager.getInstance().show(findViewById(R.id.select_Pay), new YiBaPayManager.OnGenerateOrderCallback() {
+                    @Override
+                    public void generateAliOrder() {
 
-                YiBaPayManager.getInstance().subsGood(MainActivity.this, "svip_1_month", randomString.nextString().toString());
+                    }
+
+                    @Override
+                    public void generateWxOrder() {
+
+                    }
+
+                    @Override
+                    public void generateStripeOrder() {
+
+                    }
+                });
             }
         });
         YiBaPayManager.getInstance().setOnResultListener(new IResultListener() {
@@ -140,16 +169,18 @@ public class MainActivity extends AppCompatActivity implements IAliOrderInfo, IW
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        YiBaPayManager.getInstance().bindCallBack(requestCode, resultCode, data);
-        super.onActivityResult(requestCode, resultCode, data);
+        if (!YiBaPayManager.getInstance().bindCallBack(requestCode, resultCode, data)) {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+
 
         Log.i("aCTIVITY requestCode", "requestCode = " + requestCode + "resultCode = " + resultCode);
     }
 
     @Override
     protected void onDestroy() {
-        YiBaPayManager.getInstance().DestoryQuote();
         super.onDestroy();
+        YiBaPayManager.getInstance().DestoryQuote();
     }
 }
 

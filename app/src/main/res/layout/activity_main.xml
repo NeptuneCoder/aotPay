@@ -3,25 +3,58 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:orientation="vertical"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context="demo.alipay.yiba.com.ybpaydemo.MainActivity">
+
     <FrameLayout
-        android:layout_width="1px"
         android:id="@+id/v"
-        android:layout_height="1px"/>
+        android:layout_width="1px"
+        android:layout_height="1px" />
+
     <Button
-        android:layout_width="wrap_content"
+        android:id="@+id/select_Pay"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="showPay"
-        android:id="@+id/showPay"
-         />
-     <EditText
-         android:layout_width="match_parent"
-         android:layout_height="match_parent"
-         android:id="@+id/et"
-         android:hint="请输入支付的订单信息"
-         />
+        android:text="select_pay" />
+
+    <Button
+        android:id="@+id/ali_pay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="alipay" />
+
+    <Button
+        android:id="@+id/wx_pay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="weixin pay" />
+
+    <Button
+        android:id="@+id/google_pay_inapp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="google pay  inapp" />
+
+    <Button
+        android:id="@+id/google_pay_subs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="google pay subs" />
+
+    <Button
+        android:id="@+id/stripe_pay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="stripe pay" />
+
+
+
+    <EditText
+        android:id="@+id/et"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:hint="请输入支付的订单信息" />
 
 
 </LinearLayout>

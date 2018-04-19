@@ -33,6 +33,8 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.android.vending.billing.IInAppBillingService;
+import com.yiba.pay.GooglePay;
+import com.yiba.pay.YiBaPayManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -172,13 +174,16 @@ public class IabHelper {
      *
      * @param ctx             Your application or Activity context. Needed to bind to the in-app billing service.
      * @param base64PublicKey Your application's public key, encoded in base64.
-     *                        This is used for verification of purchase signatures. You can find your app's base64-encoded
-     *                        public key in your application's page on Google Play Developer Console. Note that this
-     *                        is NOT your "developer public key".
+     * This is used for verification of purchase signatures. You can find your app's base64-encoded
+     * public key in your application's page on Google Play Developer Console. Note that this
+     * is NOT your "developer public key".
      */
-    public IabHelper(Context ctx, String base64PublicKey) {
+    private IabHelperCallbackListener listener;
+
+    public IabHelper(Context ctx, String base64PublicKey, IabHelperCallbackListener listener) {
         mContext = ctx.getApplicationContext();
         mSignatureBase64 = base64PublicKey;
+        this.listener = listener;
         logDebug("IAB helper created.");
     }
 
@@ -413,23 +418,18 @@ public class IabHelper {
     // the purchase finishes
     OnIabPurchaseFinishedListener mPurchaseListener;
 
-    public void launchPurchaseFlow(Activity act, String sku, int requestCode, OnIabPurchaseFinishedListener listener)
-            throws IabAsyncInProgressException {
-        launchPurchaseFlow(act, sku, requestCode, listener, "");
-    }
 
     public void launchPurchaseFlow(Activity act, String sku, int requestCode, OnIabPurchaseFinishedListener listener, String extraData) throws IabAsyncInProgressException {
+        currBuyType = ITEM_TYPE_INAPP;
         launchPurchaseFlow(act, sku, ITEM_TYPE_INAPP, null, requestCode, listener, extraData);
     }
 
-    public void launchSubscriptionPurchaseFlow(Activity act, String sku, int requestCode,
-                                               OnIabPurchaseFinishedListener listener) throws IabAsyncInProgressException {
-        launchSubscriptionPurchaseFlow(act, sku, requestCode, listener, "");
-    }
+
 
     public void launchSubscriptionPurchaseFlow(Activity act, String sku, int requestCode,
                                                OnIabPurchaseFinishedListener listener, String extraData)
             throws IabAsyncInProgressException {
+        currBuyType = ITEM_TYPE_SUBS;
         launchPurchaseFlow(act, sku, ITEM_TYPE_SUBS, null, requestCode, listener, extraData);
     }
 
@@ -536,6 +536,8 @@ public class IabHelper {
      * false if the result was not related to a purchase, in which case you should
      * handle it normally.
      */
+    private String currBuyType;
+
     public boolean handleActivityResult(int requestCode, int resultCode, Intent data) {
         IabResult result;
         if (requestCode != mRequestCode) return false;
@@ -584,9 +586,19 @@ public class IabHelper {
                     result = new IabResult(IABHELPER_VERIFICATION_FAILED, "Signature verification failed for sku " + sku);
                     if (mPurchaseListener != null)
                         mPurchaseListener.onIabPurchaseFinished(result, purchase);
-                    return true;
                 }
                 logDebug("Purchase signature successfully verified.");
+                if (listener != null) {
+                    GooglePay.OrderParam param = new GooglePay.OrderParam();
+                    param.purchaseData = purchaseData;
+                    param.dataSignature = dataSignature;
+                    param.purchaseData = purchaseData;
+                    param.responseCode = responseCode;
+                    param.resultCode = resultCode;
+                    param.currBuyType = currBuyType;
+                    listener.onGgSuccess(param);
+
+                }
             } catch (JSONException e) {
                 logError("Failed to parse purchase data.");
                 e.printStackTrace();
@@ -960,7 +972,7 @@ public class IabHelper {
         }
     }
 
-    void flagEndAsync() {
+    public void flagEndAsync() {
         synchronized (mAsyncInProgressLock) {
             logDebug("Ending async operation: " + mAsyncOperation);
             mAsyncOperation = "";
