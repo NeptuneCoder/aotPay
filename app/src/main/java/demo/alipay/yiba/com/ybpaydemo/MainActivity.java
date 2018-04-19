@@ -180,7 +180,7 @@ public class MainActivity extends AppCompatActivity implements IAliOrderInfo, IW
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        YiBaPayManager.getInstance().DestoryQuote();
+//        YiBaPayManager.getInstance().DestoryQuote();
     }
 }
 
