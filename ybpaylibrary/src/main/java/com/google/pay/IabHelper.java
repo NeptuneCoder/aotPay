@@ -184,6 +184,7 @@ public class IabHelper {
         mContext = ctx.getApplicationContext();
         mSignatureBase64 = base64PublicKey;
         this.listener = listener;
+        mDisposed = false;
         logDebug("IAB helper created.");
     }
 
@@ -423,7 +424,6 @@ public class IabHelper {
         currBuyType = ITEM_TYPE_INAPP;
         launchPurchaseFlow(act, sku, ITEM_TYPE_INAPP, null, requestCode, listener, extraData);
     }
-
 
 
     public void launchSubscriptionPurchaseFlow(Activity act, String sku, int requestCode,

@@ -32,8 +32,6 @@ import java.util.List;
  */
 
 public class GooglePay {
-
-    private String currBuyType = "";
     public static final int IABHELPER_ERROR_BASE = -1000;
     public static final int IABHELPER_REMOTE_EXCEPTION = -1001;
     public static final int IABHELPER_BAD_RESPONSE = -1002;
@@ -48,20 +46,20 @@ public class GooglePay {
     public static final int IABHELPER_SUBSCRIPTION_UPDATE_NOT_AVAILABLE = -1011;
     public static final int ISECURITY_VERIFY_FAILE = -1012;
     public static final int BILLING_RESPONSE_RESULT_ERR = -1013;
-    private final Handler handler;
+    private String currBuyType = "";
+    private IGooglePayStatusListener listener;
+    private IabHelper mHelper = null;
+    IabBroadcastReceiver mBroadcastReceiver;
     static final int RC_REQUEST = 10001;
-    //标记广播是否注册成功，用于反注册判断
-    private boolean isRegisterStatus = false;
+
     private Activity activity;
     private String base64;
 
-    public GooglePay(final Activity activity, String base64, Handler handler) {
-        this.handler = handler;
+    public GooglePay(final Activity activity, String base64, IGooglePayStatusListener listener) {
+        this.listener = listener;
         GgPayInit(activity, base64);
     }
 
-    private IabHelper mHelper = null;
-    IabBroadcastReceiver mBroadcastReceiver;
 
     public void GgPayInit(final Activity activity, String base64) {
         this.base64 = base64;
@@ -69,10 +67,7 @@ public class GooglePay {
         mHelper = new IabHelper(activity, base64, new IabHelperCallbackListener() {
             @Override
             public void onGgSuccess(OrderParam data) {
-                Message msg = new Message();
-                msg.what = YiBaPayManager.GOOGLE_PAY;
-                msg.obj = data;
-                handler.sendMessage(msg);
+                listener.callBackStatus(data);
             }
         });
 
@@ -81,11 +76,8 @@ public class GooglePay {
                 public void onIabSetupFinished(IabResult result) {
 
                     if (!result.isSuccess()) {
-                        if (handler != null) {
-                            Message msg = handler.obtainMessage();
-                            msg.what = YiBaPayManager.GOOGLE_PAY;
-                            msg.obj = IGooglePayResultListener.INIT_FAILED;
-                            handler.sendMessage(msg);
+                        if (listener != null) {
+                            listener.callBackStatus(IGooglePayResultListener.INIT_FAILED);
                         }
                         return;
                     }
@@ -106,30 +98,21 @@ public class GooglePay {
 
                 @Override
                 public void onPayStatus(int result) {
-                    if (handler != null) {
-                        Message msg = handler.obtainMessage();
-                        msg.what = YiBaPayManager.GOOGLE_PAY;
-                        msg.obj = result;
-                        handler.sendMessage(msg);
+                    if (listener != null) {
+                        listener.callBackStatus(result);
                     }
                 }
 
                 @Override
                 public void onConsumedStatus(int result) {
-                    if (handler != null) {
-                        Message msg = handler.obtainMessage();
-                        msg.what = YiBaPayManager.GOOGLE_PAY;
-                        msg.obj = result;
-                        handler.sendMessage(msg);
+                    if (listener != null) {
+                        listener.callBackStatus(result);
                     }
                 }
             });
         } catch (Exception e) {
-            if (handler != null) {
-                Message msg = handler.obtainMessage();
-                msg.what = YiBaPayManager.GOOGLE_PAY;
-                msg.obj = IGooglePayResultListener.INIT_SERVICE_FAILED;
-                handler.sendMessage(msg);
+            if (listener != null) {
+                listener.callBackStatus(IGooglePayResultListener.INIT_SERVICE_FAILED);
             }
         }
     }
@@ -140,7 +123,6 @@ public class GooglePay {
 
         @Override
         public void receivedBroadcast() {
-            isRegisterStatus = true;
             try {
                 mHelper.queryInventoryAsync(mGotInventoryListener);
             } catch (IabHelper.IabAsyncInProgressException e) {
@@ -187,14 +169,11 @@ public class GooglePay {
     };
 
     public void unRegister() {
-        if (isRegisterStatus) {
-            PackageManager pm = YiBaPayConfig.getContext().getPackageManager();
-            Intent intent = new Intent(IabBroadcastReceiver.ACTION);
-            List<ResolveInfo> list = pm.queryBroadcastReceivers(intent, 0);
-            if (list != null && !list.isEmpty()) {
-                activity.unregisterReceiver(mBroadcastReceiver);
-            }
-            isRegisterStatus = false;
+        PackageManager pm = YiBaPayConfig.getContext().getPackageManager();
+        Intent intent = new Intent(IabBroadcastReceiver.ACTION);
+        List<ResolveInfo> list = pm.queryBroadcastReceivers(intent, 0);
+        if (list != null && !list.isEmpty()) {
+            activity.unregisterReceiver(mBroadcastReceiver);
         }
     }
 
@@ -213,7 +192,9 @@ public class GooglePay {
                 }
             }
         } catch (UnLoginException e) {
-            sendErrorMsg(IGooglePayResultListener.UN_LOGIN);
+            if (listener != null) {
+                listener.callBackStatus(IGooglePayResultListener.UN_LOGIN);
+            }
         }
 
     }
@@ -231,19 +212,11 @@ public class GooglePay {
                 }
             }
         } catch (UnLoginException e) {
-            sendErrorMsg(IGooglePayResultListener.UN_LOGIN);
+            if (listener != null) {
+                listener.callBackStatus(IGooglePayResultListener.UN_LOGIN);
+            }
         }
     }
-
-    private void sendErrorMsg(int obj) {
-        if (handler != null) {
-            Message msg = handler.obtainMessage();
-            msg.what = YiBaPayManager.GOOGLE_PAY;
-            msg.obj = obj;
-            handler.sendMessage(msg);
-        }
-    }
-
 
     // Callback for when a purchase is finished
     IabHelper.OnIabPurchaseFinishedListener mPurchaseFinishedListener = new IabHelper.OnIabPurchaseFinishedListener() {
@@ -255,22 +228,25 @@ public class GooglePay {
             if (result.isFailure()) {
                 if (result.getResponse() == 7) {
                     Log.i("response:", "" + result.getResponse());
-
+                }
+                if (listener != null) {
+                    listener.callBackStatus(result.getResponse());
                 }
             }
             if (!verifyDeveloperPayload(purchase)) {
                 //
                 return;
             }
-            Log.i("tag", "Purchase successful.");
-            // bought 1/4 tank of gas. So consume it.
-            if (purchase.getSku().equals(productId)) {//购买成功后，消耗商品
-                try {
-
-                    mHelper.consumeAsync(purchase, mConsumeFinishedListener);//后面这个回调在源码中没有做事情，所以没有设置为null
-                } catch (IabHelper.IabAsyncInProgressException e) {
-                    if (currBuyType!=null&& currBuyType.equals(IabHelper.ITEM_TYPE_INAPP)){
-                        sendErrorMsg(IGooglePayResultListener.NO_SPECIFIED_ITEM);
+            if (currBuyType != null && currBuyType.equals(IabHelper.ITEM_TYPE_INAPP)) {
+                Log.i("tag", "Purchase successful.");
+                // bought 1/4 tank of gas. So consume it.
+                if (purchase.getSku().equals(productId)) {//购买成功后，消耗商品
+                    try {
+                        mHelper.consumeAsync(purchase, mConsumeFinishedListener);//后面这个回调在源码中没有做事情，所以没有设置为null
+                    } catch (IabHelper.IabAsyncInProgressException e) {
+                        if (listener != null) {
+                            listener.callBackStatus(IGooglePayResultListener.NO_SPECIFIED_ITEM);
+                        }
                     }
                     return;
                 }
@@ -283,13 +259,8 @@ public class GooglePay {
      * Verifies the developer payload of a purchase.
      */
     boolean verifyDeveloperPayload(Purchase p) {
-        if (p != null) {
-            String payload = p.getDeveloperPayload();
-            Log.i("payload", "payload:" + payload);
-            Log.i("payload", "verifyDeveloperPayload:" + developerpayload);
-            return developerpayload.equals(payload);
-        }
-        return false;
+
+        return p != null && developerpayload != null && developerpayload.equals(p.getDeveloperPayload());
 
     }
 
@@ -360,7 +331,7 @@ public class GooglePay {
         if (mHelper != null) {
             mHelper.disposeWhenFinished();
         }
-        mHelper = null;
+//        mHelper = null;
     }
 
 }

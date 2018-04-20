@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 
 
-
 /**
  * Created by yh on 2017/10/23.
  */
@@ -45,11 +44,11 @@ public class YiBaPayManager {
     private IntentFilter filter;
 
 
-    private static Handler handler = new Handler(YiBaPayConfig.getContext().getMainLooper()){
+    private static Handler handler = new Handler(YiBaPayConfig.getContext().getMainLooper()) {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            switch (msg.what){
+            switch (msg.what) {
                 case ALI_PAY:
                     PayResult payResult = new PayResult((Map<String, String>) msg.obj);
                     /**
@@ -59,75 +58,75 @@ public class YiBaPayManager {
                     // 判断resultStatus 为9000则代表支付成功
                     if (TextUtils.equals(resultStatus, "9000")) {
                         // 该笔订单是否真实支付成功，需要依赖服务端的异步通知。
-                       if (resultListener != null){
-                           resultListener.onAliSuccess();
+                        if (resultListener != null) {
+                            resultListener.onAliSuccess();
 
-                       }
-                       if (aliResultListener!=null){
-                           aliResultListener.onAliSuccess();
-                       }
+                        }
+                        if (aliResultListener != null) {
+                            aliResultListener.onAliSuccess();
+                        }
                     } else {
                         // 该笔订单真实的支付结果，需要依赖服务端的异步通知。
-                        if (resultListener != null){
+                        if (resultListener != null) {
                             resultListener.onAliFailed(Integer.parseInt(resultStatus.trim()));
                         }
-                        if (aliResultListener!=null){
+                        if (aliResultListener != null) {
                             aliResultListener.onAliFailed(Integer.parseInt(resultStatus.trim()));
                         }
                     }
                     break;
                 case WEIXIN_PAY:
                     String code = (String) msg.obj;
-                    if ("0".equals(code)){
+                    if ("0".equals(code)) {
                         // 该笔订单是否真实支付成功，需要依赖服务端的异步通知。
-                        if (resultListener != null){
+                        if (resultListener != null) {
                             resultListener.onWxSuccess();
                         }
-                        if (wxResultListener!=null){
+                        if (wxResultListener != null) {
                             wxResultListener.onWxSuccess();
                         }
-                    }else{
+                    } else {
                         // 该笔订单真实的支付结果，需要依赖服务端的异步通知。
-                        if (resultListener != null){
+                        if (resultListener != null) {
                             resultListener.onWxFailed(Integer.parseInt(code.trim()));
                         }
-                        if (wxResultListener!=null){
+                        if (wxResultListener != null) {
                             wxResultListener.onWxFailed(Integer.parseInt(code.trim()));
                         }
                     }
 
                     break;
                 case GOOGLE_PAY:
-                    if (msg.obj instanceof Integer){
-                        int  ggCode = (int) msg.obj;
-                        if (ggCode == IGooglePayResultListener.INIT_FAILED){
+                    if (msg.obj instanceof Integer) {
+                        int ggCode = (int) msg.obj;
+                        if (ggCode == IGooglePayResultListener.INIT_FAILED) {
                             // 该笔订单真实的支付结果，需要依赖服务端的异步通知。
-                            if (resultListener != null){
+                            if (resultListener != null) {
                                 resultListener.onGgFailed(IGooglePayResultListener.INIT_FAILED);
                             }
-                            if (googleResultListener!=null){
+                            if (googleResultListener != null) {
                                 googleResultListener.onGgFailed(IGooglePayResultListener.INIT_FAILED);
                             }
-                        }else if (ggCode == IGooglePayResultListener.UN_LOGIN){
+                        } else if (ggCode == IGooglePayResultListener.UN_LOGIN) {
                             // 该笔订单真实的支付结果，需要依赖服务端的异步通知。
-                            if (resultListener != null){
+                            if (resultListener != null) {
                                 resultListener.onGgFailed(IGooglePayResultListener.UN_LOGIN);
                             }
-                            if (googleResultListener!=null){
+                            if (googleResultListener != null) {
                                 googleResultListener.onGgFailed(IGooglePayResultListener.UN_LOGIN);
                             }
-                        }else{
+                        } else {
                             // 该笔订单真实的支付结果，需要依赖服务端的异步通知。
-                            if (resultListener != null){
+                            if (resultListener != null) {
                                 resultListener.onGgFailed(ggCode);
                             }
-                            if (googleResultListener!=null){
+                            if (googleResultListener != null) {
                                 googleResultListener.onGgFailed(ggCode);
                             }
                         }
-                    } else if (msg.obj instanceof GooglePay.OrderParam){
+                    } else if (msg.obj instanceof GooglePay.OrderParam) {
                         GooglePay.OrderParam result = (GooglePay.OrderParam) msg.obj;
-                        if (googleResultListener!=null){
+                        if (googleResultListener != null) {
                             googleResultListener.onGgSuccess(result);
                         }
                     }
@@ -139,67 +138,73 @@ public class YiBaPayManager {
     };
 
 
-    private YiBaPayManager(){
+    private YiBaPayManager() {
         //初始化googepay
     }
-    public void initWxCallback(){
+
+    public void initWxCallback() {
         filter = new IntentFilter();
         filter.addAction(ACTION);
-        YiBaPayConfig.getContext().registerReceiver(wxPayResult,filter,BROADCAST_PERMISSION_DISC,null);
+        YiBaPayConfig.getContext().registerReceiver(wxPayResult, filter, BROADCAST_PERMISSION_DISC, null);
     }
 
-    private static class SingleTonHolder{
+    private static class SingleTonHolder {
         private final static YiBaPayManager INSTANCE = new YiBaPayManager();
     }
 
-    public static YiBaPayManager getInstance(){
+    public static YiBaPayManager getInstance() {
         return SingleTonHolder.INSTANCE;
     }
 
     /**
      * 设置订单信息的实现
+     *
      * @param orderInfo
      */
-    public void setAliOrderInfo(IAliOrderInfo orderInfo){
+    public void setAliOrderInfo(IAliOrderInfo orderInfo) {
         this.aliOrderInfo = orderInfo;
     }
 
 
     /**
      * 设置订单信息的实现
+     *
      * @param orderInfo
      */
-    public void setWxOrderInfo(IWxOrderInfo orderInfo){
+    public void setWxOrderInfo(IWxOrderInfo orderInfo) {
         this.wxOrderInfo = orderInfo;
-    }
-    /**
-     * 设置支付结果的回调
-     * @param resultListener
-     */
-    public void setOnResultListener(IResultListener resultListener){
-        this.resultListener  = resultListener;
     }
 
     /**
      * 设置支付结果的回调
+     *
      * @param resultListener
      */
-    public void setOnGoogleResultListener(IGooglePayResultListener resultListener){
-        this.googleResultListener  = resultListener;
+    public void setOnResultListener(IResultListener resultListener) {
+        this.resultListener = resultListener;
+    }
+
+    /**
+     * 设置支付结果的回调
+     *
+     * @param resultListener
+     */
+    public void setOnGoogleResultListener(IGooglePayResultListener resultListener) {
+        this.googleResultListener = resultListener;
     }
 
     /**
      * 支付宝支付
      */
-    public void  aliPay(){
-        if (aliOrderInfo == null){
+    public void aliPay() {
+        if (aliOrderInfo == null) {
             throw new NullPointerException("aliOrderInfo  为商品信息不能为空，需要实现 IAliOrderInfo 接口 同时调用setOrderInfo方法");
         }
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
                 PayTask alipay = new PayTask((Activity) YiBaPayConfig.getContext());
-                Map<String, String> result = alipay.payV2(aliOrderInfo.getAlipayInfo(),true);
+                Map<String, String> result = alipay.payV2(aliOrderInfo.getAlipayInfo(), true);
 
                 Message msg = handler.obtainMessage();
                 msg.what = ALI_PAY;
@@ -215,8 +220,8 @@ public class YiBaPayManager {
     /**
      * 微信支付
      */
-    public void wxPay(){
-        if (wxOrderInfo == null){
+    public void wxPay() {
+        if (wxOrderInfo == null) {
             throw new NullPointerException("wxOrderInfo  为商品信息不能为空，需要实现 IWxOrderInfo 接口 同时调用setOrderInfo方法");
         }
         IWXAPI msgApi = WXAPIFactory.createWXAPI(YiBaPayConfig.getContext(), null);
@@ -234,12 +239,12 @@ public class YiBaPayManager {
     }
 
 
-
     /**
      * 这里随便传入一个布局
+     *
      * @param parent
      */
-    public void show(View parent, final OnGenerateOrderCallback callback){
+    public void show(View parent, final OnGenerateOrderCallback callback) {
         final PayWindow payWindow = new PayWindow(YiBaPayConfig.getContext());
         payWindow.showAtLocation(parent);
         payWindow.setPayListener(new PayWindow.onPayListener() {
@@ -261,7 +266,7 @@ public class YiBaPayManager {
 
             @Override
             public void stripePay() {
-                if (callback != null){
+                if (callback != null) {
                     callback.generateStripeOrder();
                 }
                 payWindow.dismiss();
@@ -269,13 +274,15 @@ public class YiBaPayManager {
         });
     }
 
-    public interface OnGenerateOrderCallback{
+    public interface OnGenerateOrderCallback {
         void generateAliOrder();
+
         void generateWxOrder();
+
         void generateStripeOrder();
     }
 
-    public BroadcastReceiver wxPayResult = new  BroadcastReceiver(){
+    public BroadcastReceiver wxPayResult = new BroadcastReceiver() {
 
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -284,44 +291,63 @@ public class YiBaPayManager {
             msg.what = WEIXIN_PAY;
             msg.obj = code;
             handler.sendMessage(msg);
-            Log.i("onPayFinish,errCode=","Code  =  " +code);
+            Log.i("onPayFinish,errCode=", "Code  =  " + code);
         }
     };
     private GooglePay googlePay;
 
-    public void initGooglePay(Activity activity){
-        googlePay = new GooglePay(activity, YiBaPayConfig.getGgAppId(),handler);
+    public void initGooglePay(Activity activity) {
+        googlePay = new GooglePay(activity, YiBaPayConfig.getGgAppId(), new IGooglePayStatusListener() {
+
+            @Override
+            public void callBackStatus(int status) {
+                Message msg = handler.obtainMessage();
+                msg.what = GOOGLE_PAY;
+                msg.obj = status;
+                handler.sendMessage(msg);
+            }
+
+            @Override
+            public void callBackStatus(GooglePay.OrderParam data) {
+                Message msg = handler.obtainMessage();
+                msg.what = GOOGLE_PAY;
+                msg.obj = data;
+                handler.sendMessage(msg);
+            }
+        });
     }
 
-    public void  subsGood(Activity activity,String productId,String developerPayload){
-        if (googlePay!=null){
-            googlePay.launchSubscriptionPurchaseFlow(activity,productId,developerPayload);
-        }else{
-            Log.i("tag","please init google pay");
+    public void subsGood(Activity activity, String productId, String developerPayload) {
+        if (googlePay != null) {
+            googlePay.launchSubscriptionPurchaseFlow(activity, productId, developerPayload);
+        } else {
+            Log.i("tag", "please init google pay");
         }
 
     }
-    public void  GgBuyGoods(Activity activity,String productId,String developerPayload){
-        if (googlePay!=null){
-            googlePay.buyGoods(activity,productId,developerPayload);
-        }else{
-            Log.i("tag","please init google pay");
+
+    public void GgBuyGoods(Activity activity, String productId, String developerPayload) {
+        if (googlePay != null) {
+            googlePay.buyGoods(activity, productId, developerPayload);
+        } else {
+            Log.i("tag", "please init google pay");
         }
 
     }
 
 
     @Deprecated
-    public void  GgBuyGoods(Activity activity,String productId){
-        if (googlePay!=null){
-            googlePay.buyGoods(activity,productId,"");
-        }else{
-            Log.i("tag","please init google pay");
+    public void GgBuyGoods(Activity activity, String productId) {
+        if (googlePay != null) {
+            googlePay.buyGoods(activity, productId, "");
+        } else {
+            Log.i("tag", "please init google pay");
         }
 
     }
-    private void unRegisterGoogleBroadCast(){
-        if (googlePay!=null){
+
+    private void freeGooglePayBroadCast() {
+        if (googlePay != null) {
             googlePay.unRegister();
             googlePay.OnDispose();
         }
@@ -332,9 +358,9 @@ public class YiBaPayManager {
     /**
      * 销毁引用
      */
-    public void DestoryQuote(){
+    public void DestoryQuote() {
         unRegisterWxBroadCast();
-        unRegisterGoogleBroadCast();
+        freeGooglePayBroadCast();
         googleResultListener = null;
         aliResultListener = null;
         wxResultListener = null;
@@ -343,24 +369,25 @@ public class YiBaPayManager {
         YiBaPayConfig.setGgAppId(null);
 
     }
+
     /**
      * 广播销毁,这个方法在Activity销毁的时候需要调用。
      */
-    private void unRegisterWxBroadCast(){
-        if (wxPayResult!=null){
+    private void unRegisterWxBroadCast() {
+        if (wxPayResult != null) {
             PackageManager pm = YiBaPayConfig.getContext().getPackageManager();
             Intent intent = new Intent(ACTION);
-            List<ResolveInfo> list =  pm.queryBroadcastReceivers(intent,0);
-            if (list!=null && !list.isEmpty()){
+            List<ResolveInfo> list = pm.queryBroadcastReceivers(intent, 0);
+            if (list != null && !list.isEmpty()) {
                 YiBaPayConfig.getContext().unregisterReceiver(wxPayResult);
             }
         }
     }
 
 
-    public boolean bindCallBack(int requestCode, int resultCode, Intent data){
-        if (googlePay!=null){
-          return   googlePay.bindCallBack(requestCode,resultCode,data);
+    public boolean bindCallBack(int requestCode, int resultCode, Intent data) {
+        if (googlePay != null) {
+            return googlePay.bindCallBack(requestCode, resultCode, data);
         }
         return false;
     }
