@@ -21,6 +21,7 @@ public class WeiXinPay {
     private static final String BROADCAST_PERMISSION_DISC = "com.yiba.permissions.YiBaPay";
     public static final String ACTION = "com.yiba.pay.wxResult";
     private IntentFilter filter;
+
     public WeiXinPay(IWeiXinCallback iWeiXinCallback) {
         this.iWeiXinCallback = iWeiXinCallback;
         filter = new IntentFilter();
@@ -45,12 +46,13 @@ public class WeiXinPay {
         request.sign = iWeiXinCallback.getWxPayInfo().sign;
         msgApi.sendReq(request);
     }
+
     public BroadcastReceiver wxPayResult = new BroadcastReceiver() {
 
         @Override
         public void onReceive(Context context, Intent intent) {
             String code = intent.getStringExtra("code");
-            if (iWeiXinCallback!=null){
+            if (iWeiXinCallback != null) {
                 iWeiXinCallback.onResult(code);
             }
             Log.i("onPayFinish,errCode=", "Code  =  " + code);
@@ -67,4 +69,6 @@ public class WeiXinPay {
             }
         }
     }
+
+
 }

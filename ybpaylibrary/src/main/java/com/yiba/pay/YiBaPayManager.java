@@ -148,6 +148,7 @@ public class YiBaPayManager {
     }
 
 
+
     /**
      * 设置支付结果的回调
      *
@@ -339,6 +340,7 @@ public class YiBaPayManager {
         YiBaPayConfig.setGgAppId(null);
 
     }
+
 
 
     public boolean bindCallBack(int requestCode, int resultCode, Intent data) {
