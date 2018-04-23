@@ -1,10 +1,10 @@
-package com.yiba.pay;
+package com.ali.pay;
 
 /**
  * Created by yh on 2018/1/17.
  */
 
-public interface IAliResultListener {
+public interface IAliResult {
 
     void  onAliFailed(int code);
 

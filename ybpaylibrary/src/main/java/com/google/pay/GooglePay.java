@@ -1,28 +1,15 @@
-package com.yiba.pay;
+package com.google.pay;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 
-import com.google.pay.IabBroadcastReceiver;
-import com.google.pay.IabHelper;
-import com.google.pay.IabHelperCallbackListener;
-import com.google.pay.IabResult;
-import com.google.pay.Inventory;
-import com.google.pay.Purchase;
-import com.google.pay.Security;
-import com.google.pay.UnLoginException;
-
-import org.json.JSONException;
+import com.yiba.pay.YiBaPayConfig;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -47,7 +34,7 @@ public class GooglePay {
     public static final int ISECURITY_VERIFY_FAILE = -1012;
     public static final int BILLING_RESPONSE_RESULT_ERR = -1013;
     private String currBuyType = "";
-    private IGooglePayStatusListener listener;
+    private IGooglePayStatus listener;
     private IabHelper mHelper = null;
     IabBroadcastReceiver mBroadcastReceiver;
     static final int RC_REQUEST = 10001;
@@ -55,7 +42,7 @@ public class GooglePay {
     private Activity activity;
     private String base64;
 
-    public GooglePay(final Activity activity, String base64, IGooglePayStatusListener listener) {
+    public GooglePay(final Activity activity, String base64, IGooglePayStatus listener) {
         this.listener = listener;
         GgPayInit(activity, base64);
     }
@@ -64,7 +51,7 @@ public class GooglePay {
     public void GgPayInit(final Activity activity, String base64) {
         this.base64 = base64;
         this.activity = activity;
-        mHelper = new IabHelper(activity, base64, new IabHelperCallbackListener() {
+        mHelper = new IabHelper(activity, base64, new IabHelperCallback() {
             @Override
             public void onGgSuccess(OrderParam data) {
                 listener.callBackStatus(data);

@@ -1,4 +1,4 @@
-package com.yiba.pay;
+package com.weixin.pay;
 
 import java.io.Serializable;
 

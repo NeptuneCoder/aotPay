@@ -1,6 +1,7 @@
-package com.yiba.pay;
+package com.google.pay;
 
-public interface IGooglePayStatusListener {
+
+public interface IGooglePayStatus {
 
     void callBackStatus(int status);
 

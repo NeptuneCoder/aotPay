@@ -1,25 +1,27 @@
 package com.yiba.pay;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.os.Handler;
 import android.os.Message;
-import android.test.suitebuilder.annotation.Suppress;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 
-import com.alipay.sdk.app.PayTask;
-import com.tencent.mm.opensdk.modelpay.PayReq;
-import com.tencent.mm.opensdk.openapi.IWXAPI;
-import com.tencent.mm.opensdk.openapi.WXAPIFactory;
+import com.ali.pay.AliPay;
+import com.ali.pay.IGetAliOrderInfoListener;
+import com.ali.pay.IAliResultCallback;
+import com.ali.pay.IAliResult;
+import com.ali.pay.PayResult;
+import com.google.pay.GooglePay;
+import com.google.pay.IGooglePayResultListener;
+import com.google.pay.IGooglePayStatus;
+import com.weixin.pay.IGetWxOrderInfoListener;
+import com.weixin.pay.IWeiXinCallback;
+import com.weixin.pay.IWxResult;
+import com.weixin.pay.WeiXinPay;
+import com.weixin.pay.WxPayInfo;
 
-import java.util.List;
 import java.util.Map;
 
 
@@ -32,16 +34,10 @@ public class YiBaPayManager {
     private static final int ALI_PAY = 001;
     private static final int WEIXIN_PAY = 002;
     public static final int GOOGLE_PAY = 003;
-    private IAliOrderInfo aliOrderInfo;
-    private IWxOrderInfo wxOrderInfo;
     private static IResultListener resultListener;
-    private static IAliResultListener aliResultListener;
-    private static IWxResultListener wxResultListener;
+    private static IAliResult aliResultListener;
+    private static IWxResult wxResultListener;
     private static IGooglePayResultListener googleResultListener;
-
-    private static final String BROADCAST_PERMISSION_DISC = "com.yiba.permissions.YiBaPay";
-    public static final String ACTION = "com.yiba.pay.wxResult";
-    private IntentFilter filter;
 
 
     private static Handler handler = new Handler(YiBaPayConfig.getContext().getMainLooper()) {
@@ -142,11 +138,6 @@ public class YiBaPayManager {
         //初始化googepay
     }
 
-    public void initWxCallback() {
-        filter = new IntentFilter();
-        filter.addAction(ACTION);
-        YiBaPayConfig.getContext().registerReceiver(wxPayResult, filter, BROADCAST_PERMISSION_DISC, null);
-    }
 
     private static class SingleTonHolder {
         private final static YiBaPayManager INSTANCE = new YiBaPayManager();
@@ -156,24 +147,6 @@ public class YiBaPayManager {
         return SingleTonHolder.INSTANCE;
     }
 
-    /**
-     * 设置订单信息的实现
-     *
-     * @param orderInfo
-     */
-    public void setAliOrderInfo(IAliOrderInfo orderInfo) {
-        this.aliOrderInfo = orderInfo;
-    }
-
-
-    /**
-     * 设置订单信息的实现
-     *
-     * @param orderInfo
-     */
-    public void setWxOrderInfo(IWxOrderInfo orderInfo) {
-        this.wxOrderInfo = orderInfo;
-    }
 
     /**
      * 设置支付结果的回调
@@ -196,45 +169,51 @@ public class YiBaPayManager {
     /**
      * 支付宝支付
      */
-    public void aliPay() {
+    public void aliPay(final IGetAliOrderInfoListener aliOrderInfo) {
         if (aliOrderInfo == null) {
-            throw new NullPointerException("aliOrderInfo  为商品信息不能为空，需要实现 IAliOrderInfo 接口 同时调用setOrderInfo方法");
+            throw new NullPointerException("aliOrderInfo  为商品信息不能为空，需要实现 IGetAliOrderInfoListener 接口 同时调用setOrderInfo方法");
         }
-        Runnable runnable = new Runnable() {
+        AliPay alipay = new AliPay(new IAliResultCallback() {
             @Override
-            public void run() {
-                PayTask alipay = new PayTask((Activity) YiBaPayConfig.getContext());
-                Map<String, String> result = alipay.payV2(aliOrderInfo.getAlipayInfo(), true);
-
+            public void onResult(Map<String, String> res) {
                 Message msg = handler.obtainMessage();
                 msg.what = ALI_PAY;
-                msg.obj = result;
+                msg.obj = res;
                 handler.sendMessage(msg);
             }
-        };
 
-        Thread payThread = new Thread(runnable);
-        payThread.start();
+            @Override
+            public String getOrderInfo() {
+                return aliOrderInfo.getAlipayInfo();
+            }
+        });
+        alipay.aliPay();
     }
 
     /**
      * 微信支付
      */
-    public void wxPay() {
+    private WeiXinPay weiXinPay;
+
+    public void wxPay(final IGetWxOrderInfoListener wxOrderInfo) {
         if (wxOrderInfo == null) {
-            throw new NullPointerException("wxOrderInfo  为商品信息不能为空，需要实现 IWxOrderInfo 接口 同时调用setOrderInfo方法");
+            throw new NullPointerException("wxOrderInfo  为商品信息不能为空，需要实现 IGetWxOrderInfoListener 接口 同时调用setOrderInfo方法");
         }
-        IWXAPI msgApi = WXAPIFactory.createWXAPI(YiBaPayConfig.getContext(), null);
-        msgApi.registerApp(YiBaPayConfig.getWxAppId());
-        PayReq request = new PayReq();
-        request.appId = YiBaPayConfig.getWxAppId();
-        request.partnerId = wxOrderInfo.getWxpayInfo().partnerid;
-        request.prepayId = wxOrderInfo.getWxpayInfo().prepayid;
-        request.packageValue = "Sign=WXPay";
-        request.nonceStr = wxOrderInfo.getWxpayInfo().noncestr;
-        request.timeStamp = String.valueOf(wxOrderInfo.getWxpayInfo().timestamp);
-        request.sign = wxOrderInfo.getWxpayInfo().sign;
-        msgApi.sendReq(request);
+        weiXinPay = new WeiXinPay(new IWeiXinCallback() {
+            @Override
+            public WxPayInfo getWxPayInfo() {
+                return wxOrderInfo.getWxPayInfo();
+            }
+
+            @Override
+            public void onResult(String code) {
+                Message msg = handler.obtainMessage();
+                msg.what = WEIXIN_PAY;
+                msg.obj = code;
+                handler.sendMessage(msg);
+            }
+        });
+        weiXinPay.wxPay();
 
     }
 
@@ -282,22 +261,11 @@ public class YiBaPayManager {
         void generateStripeOrder();
     }
 
-    public BroadcastReceiver wxPayResult = new BroadcastReceiver() {
 
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String code = intent.getStringExtra("code");
-            Message msg = handler.obtainMessage();
-            msg.what = WEIXIN_PAY;
-            msg.obj = code;
-            handler.sendMessage(msg);
-            Log.i("onPayFinish,errCode=", "Code  =  " + code);
-        }
-    };
     private GooglePay googlePay;
 
     public void initGooglePay(Activity activity) {
-        googlePay = new GooglePay(activity, YiBaPayConfig.getGgAppId(), new IGooglePayStatusListener() {
+        googlePay = new GooglePay(activity, YiBaPayConfig.getGgAppId(), new IGooglePayStatus() {
 
             @Override
             public void callBackStatus(int status) {
@@ -359,7 +327,9 @@ public class YiBaPayManager {
      * 销毁引用
      */
     public void DestoryQuote() {
-        unRegisterWxBroadCast();
+        if (weiXinPay != null) {
+            weiXinPay.unRegisterWxBroadCast();
+        }
         freeGooglePayBroadCast();
         googleResultListener = null;
         aliResultListener = null;
@@ -368,20 +338,6 @@ public class YiBaPayManager {
         YiBaPayConfig.setWxAppId(null);
         YiBaPayConfig.setGgAppId(null);
 
-    }
-
-    /**
-     * 广播销毁,这个方法在Activity销毁的时候需要调用。
-     */
-    private void unRegisterWxBroadCast() {
-        if (wxPayResult != null) {
-            PackageManager pm = YiBaPayConfig.getContext().getPackageManager();
-            Intent intent = new Intent(ACTION);
-            List<ResolveInfo> list = pm.queryBroadcastReceivers(intent, 0);
-            if (list != null && !list.isEmpty()) {
-                YiBaPayConfig.getContext().unregisterReceiver(wxPayResult);
-            }
-        }
     }
 
 

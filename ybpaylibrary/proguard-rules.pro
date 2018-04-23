@@ -57,8 +57,8 @@
 
 
 #
--keep public class com.yiba.pay.IAliOrderInfo{*;}
--keep public class com.yiba.pay.IWxOrderInfo{*;}
+-keep public class com.ali.pay.IGetAliOrderInfoListener{*;}
+-keep public class com.weixin.pay.IGetWxOrderInfoListener{*;}
 -keep public class com.yiba.pay.IResultListener{*;}
 #-keep public class com.yiba.pay.YiBaPayManager{*;}
 #

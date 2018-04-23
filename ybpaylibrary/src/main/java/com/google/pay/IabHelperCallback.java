@@ -1,8 +1,6 @@
 package com.google.pay;
 
-import com.yiba.pay.GooglePay;
-
-public interface IabHelperCallbackListener {
+public interface IabHelperCallback {
 
     void onGgSuccess(GooglePay.OrderParam data);
 }

@@ -5,24 +5,27 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.ali.pay.AliPay;
+import com.ali.pay.IAliResultCallback;
+import com.ali.pay.IGetAliOrderInfoListener;
 import com.google.pay.RandomString;
-import com.yiba.pay.GooglePay;
-import com.yiba.pay.IAliOrderInfo;
-import com.yiba.pay.IGooglePayResultListener;
+import com.google.pay.GooglePay;
+import com.google.pay.IGooglePayResultListener;
+import com.weixin.pay.IGetWxOrderInfoListener;
+import com.weixin.pay.IWeiXinCallback;
+import com.weixin.pay.WeiXinPay;
 import com.yiba.pay.IResultListener;
-import com.yiba.pay.IWxOrderInfo;
-import com.yiba.pay.WxPayInfo;
+import com.weixin.pay.WxPayInfo;
 import com.yiba.pay.YiBaPayConfig;
 import com.yiba.pay.YiBaPayManager;
 
 import java.util.Map;
 
 
-public class MainActivity extends AppCompatActivity implements IAliOrderInfo, IWxOrderInfo {
+public class MainActivity extends AppCompatActivity implements IGetAliOrderInfoListener, IGetWxOrderInfoListener {
     /**
      * 支付宝支付业务：入参app_id
      */
@@ -41,8 +44,55 @@ public class MainActivity extends AppCompatActivity implements IAliOrderInfo, IW
 
 
         OrderInfoEt = findViewById(R.id.et);
-        YiBaPayManager.getInstance().setAliOrderInfo(this);
-        YiBaPayManager.getInstance().setWxOrderInfo(this);
+
+        findViewById(R.id.ali_pay).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                YiBaPayManager.getInstance().aliPay(new IGetAliOrderInfoListener() {
+//                    @Override
+//                    public String getAlipayInfo() {
+//                        return  OrderInfoEt.getText().toString().trim();
+//                    }
+//                });
+                AliPay aliPay = new AliPay(new IAliResultCallback() {
+                    @Override
+                    public void onResult(Map<String, String> res) {
+
+                    }
+
+                    @Override
+                    public String getOrderInfo() {
+                        return null;
+                    }
+                });
+                aliPay.aliPay();
+            }
+        });
+        findViewById(R.id.wx_pay).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                YiBaPayManager.getInstance().wxPay(new IGetWxOrderInfoListener() {
+//                    @Override
+//                    public WxPayInfo getWxPayInfo() {
+//
+//                        return null;
+//                    }
+//                });
+
+                WeiXinPay wxPay  = new WeiXinPay(new IWeiXinCallback() {
+                    @Override
+                    public WxPayInfo getWxPayInfo() {
+                        return null;
+                    }
+
+                    @Override
+                    public void onResult(String code) {
+
+                    }
+                });
+                wxPay.wxPay();
+            }
+        });
 
         findViewById(R.id.google_pay_subs).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -146,24 +196,24 @@ public class MainActivity extends AppCompatActivity implements IAliOrderInfo, IW
      */
     @Override
     public String getAlipayInfo() {
-//        boolean rsa2 = (RSA2_PRIVATE.length() > 0);
-//        Map<String, String> params = OrderInfoUtil2_0.buildOrderParamMap(APPID, rsa2);
-//        String orderParam = OrderInfoUtil2_0.buildOrderParam(params);
-//
-//        String privateKey = rsa2 ? d : RSA_PRIVATE;
-//        String sign = OrderInfoUtil2_0.getSign(params, privateKey, rsa2);
-//        final String orderInfo = orderParam + "&" + sign;
+        boolean rsa2 = (RSA2_PRIVATE.length() > 0);
+        Map<String, String> params = OrderInfoUtil2_0.buildOrderParamMap(APPID, rsa2);
+        String orderParam = OrderInfoUtil2_0.buildOrderParam(params);
+
+        String privateKey = rsa2 ? RSA2_PRIVATE : RSA_PRIVATE;
+        String sign = OrderInfoUtil2_0.getSign(params, privateKey, rsa2);
+        final String orderInfo = orderParam + "&" + sign;
         return OrderInfoEt.getText().toString().trim();
     }
 
     @Override
-    public WxPayInfo getWxpayInfo() {
+    public WxPayInfo getWxPayInfo() {
         return null;
     }
 
 
 //    @Override
-//    public String getWxpayInfo() {
+//    public String getWxPayInfo() {
 //        return "";
 //    }
 
@@ -180,7 +230,7 @@ public class MainActivity extends AppCompatActivity implements IAliOrderInfo, IW
     @Override
     protected void onDestroy() {
         super.onDestroy();
-//        YiBaPayManager.getInstance().DestoryQuote();
+        YiBaPayManager.getInstance().DestoryQuote();
     }
 }
 

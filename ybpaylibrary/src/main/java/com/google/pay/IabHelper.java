@@ -33,8 +33,6 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.android.vending.billing.IInAppBillingService;
-import com.yiba.pay.GooglePay;
-import com.yiba.pay.YiBaPayManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -178,9 +176,9 @@ public class IabHelper {
      * public key in your application's page on Google Play Developer Console. Note that this
      * is NOT your "developer public key".
      */
-    private IabHelperCallbackListener listener;
+    private IabHelperCallback listener;
 
-    public IabHelper(Context ctx, String base64PublicKey, IabHelperCallbackListener listener) {
+    public IabHelper(Context ctx, String base64PublicKey, IabHelperCallback listener) {
         mContext = ctx.getApplicationContext();
         mSignatureBase64 = base64PublicKey;
         this.listener = listener;
