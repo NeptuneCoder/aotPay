@@ -3,11 +3,16 @@ package com.google.pay;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.util.Log;
 
+import com.google.gson.Gson;
 import com.yiba.pay.YiBaPayConfig;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.List;
@@ -61,19 +66,13 @@ public class GooglePay {
         try {
             mHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
                 public void onIabSetupFinished(IabResult result) {
-
                     if (!result.isSuccess()) {
                         if (listener != null) {
                             listener.callBackStatus(IGooglePayResultListener.INIT_FAILED);
                         }
                         return;
                     }
-                    try {
-                        mHelper.queryInventoryAsync(mGotInventoryListener);
-                    } catch (IabHelper.IabAsyncInProgressException e) {
-                        e.printStackTrace();
-                    }
-
+                    if (mHelper == null) return;
                     mBroadcastReceiver = new IabBroadcastReceiver(InitSuccessCallback);
                     IntentFilter broadcastFilter = new IntentFilter(IabBroadcastReceiver.ACTION);
                     activity.registerReceiver(mBroadcastReceiver, broadcastFilter);
@@ -164,7 +163,7 @@ public class GooglePay {
         }
     }
 
-    private String productId = "vip_1_month";
+    public String productId = "vip_1_month";
 
     public void buyGoods(final Activity activity, final String productId, final String developerPayload) {
         this.productId = productId;
@@ -205,25 +204,35 @@ public class GooglePay {
         }
     }
 
+
     // Callback for when a purchase is finished
     IabHelper.OnIabPurchaseFinishedListener mPurchaseFinishedListener = new IabHelper.OnIabPurchaseFinishedListener() {
         public void onIabPurchaseFinished(IabResult result, Purchase purchase) {
-
+            Log.i("currentThread", "currentThread mPurchaseFinishedListener= " + String.valueOf(Thread.currentThread().getName()));
             // if we were disposed of in the meantime, quit.
             if (mHelper == null) return;
 
             if (result.isFailure()) {
                 if (result.getResponse() == 7) {
-                    Log.i("response:", "" + result.getResponse());
+                    try {
+                        purchase = (Purchase) SaveObjectUtils.getObject(activity, "purchase");
+                        if (mHelper != null && purchase != null) { //如果两个商品id一样，则去消耗
+                            mHelper.consumeAsync(purchase, mConsumeFinishedListener);
+                        }
+                    } catch (ClassCastException e) {
+                    } catch (IabHelper.IabAsyncInProgressException e) {
+                        e.printStackTrace();
+                    }
                 }
                 if (listener != null) {
                     listener.callBackStatus(result.getResponse());
                 }
             }
-            if (!verifyDeveloperPayload(purchase)) {
-                //
-                return;
-            }
+            //TODO  存在异步情况，前一次和当前的未不同的payload参数，导致不能不能通过
+//            if (!verifyDeveloperPayload(purchase)) {
+
+//                return;
+//            }
             if (currBuyType != null && currBuyType.equals(IabHelper.ITEM_TYPE_INAPP)) {
                 Log.i("tag", "Purchase successful.");
                 // bought 1/4 tank of gas. So consume it.
@@ -248,13 +257,12 @@ public class GooglePay {
     boolean verifyDeveloperPayload(Purchase p) {
 
         return p != null && developerpayload != null && developerpayload.equals(p.getDeveloperPayload());
-
     }
 
     // Called when consumption is complete
     IabHelper.OnConsumeFinishedListener mConsumeFinishedListener = new IabHelper.OnConsumeFinishedListener() {
         public void onConsumeFinished(Purchase purchase, IabResult result) {
-
+            Log.i("currentThread", "currentThread mConsumeFinishedListener= " + String.valueOf(Thread.currentThread().getName()));
             // if we were disposed of in the meantime, quit.
             if (mHelper == null) return;
 
@@ -263,12 +271,22 @@ public class GooglePay {
             // sku, you probably should check...
             Log.i("ConsumeFinished", " is  success = " + result.isSuccess());
             if (result.isSuccess()) {
-
+                SaveObjectUtils.saveObject(activity, "purchase", null);
                 // successfully consumed, so we apply the effects of the item in our
                 // game world's logic, which in our case means filling the gas tank a bit
                 //TODO 消耗成功
             } else {
+                try {
+                    if (purchase != null) {
+                        mHelper.consumeAsync(purchase, mConsumeFinishedListener);//后面这个回调在源码中没有做事情，所以没有设置为null
+                    }
+                    SaveObjectUtils.saveObject(activity, "purchase", purchase);
 
+                } catch (IabHelper.IabAsyncInProgressException e) {
+                    if (listener != null) {
+                        listener.callBackStatus(IGooglePayResultListener.NO_SPECIFIED_ITEM);
+                    }
+                }
             }
         }
     };
