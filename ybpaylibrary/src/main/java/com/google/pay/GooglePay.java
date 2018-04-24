@@ -3,16 +3,12 @@ package com.google.pay;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.util.Log;
 
-import com.google.gson.Gson;
 import com.yiba.pay.YiBaPayConfig;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.List;
