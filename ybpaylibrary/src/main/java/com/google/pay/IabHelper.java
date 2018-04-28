@@ -74,7 +74,7 @@ import java.util.List;
  * attempting to start a second asynchronous operation while the first one
  * has not yet completed will result in an exception being thrown.
  */
-public class IabHelper {
+class IabHelper {
     // Is debug logging enabled?
     boolean mDebugLog = false;
     String mDebugTag = "IabHelper";
@@ -576,7 +576,11 @@ public class IabHelper {
             Purchase purchase = null;
             try {
                 purchase = new Purchase(mPurchasingItemType, purchaseData, dataSignature);
-                String sku = purchase.getSku();
+                String sku = "";
+                if (purchase != null) {
+                    sku = purchase.getSku();
+                }
+
 
                 // Verify signature
                 if (!Security.verifyPurchase(mSignatureBase64, purchaseData, dataSignature)) {

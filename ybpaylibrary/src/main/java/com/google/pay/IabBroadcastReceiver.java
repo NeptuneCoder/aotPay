@@ -22,7 +22,7 @@ import android.content.Intent;
 /**
  * Receiver for the "com.android.vending.billing.PURCHASES_UPDATED" Action
  * from the Play Store.
- *
+ * <p>
  * <p>It is possible that an in-app item may be acquired without the
  * application calling getBuyIntent(), for example if the item can be
  * redeemed from inside the Play Store using a promotional code. If this
@@ -32,7 +32,7 @@ import android.content.Intent;
  * a message to this BroadcastReceiver will indicate that the an item
  * has been acquired.</p>
  */
-public class IabBroadcastReceiver extends BroadcastReceiver {
+class IabBroadcastReceiver extends BroadcastReceiver {
     /**
      * Listener interface for received broadcast messages.
      */

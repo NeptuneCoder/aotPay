@@ -21,7 +21,7 @@ import org.json.JSONObject;
 /**
  * Represents an in-app product's listing details.
  */
-public class SkuDetails {
+class SkuDetails {
     private final String mItemType;
     private final String mSku;
     private final String mType;
@@ -49,13 +49,33 @@ public class SkuDetails {
         mDescription = o.optString("description");
     }
 
-    public String getSku() { return mSku; }
-    public String getType() { return mType; }
-    public String getPrice() { return mPrice; }
-    public long getPriceAmountMicros() { return mPriceAmountMicros; }
-    public String getPriceCurrencyCode() { return mPriceCurrencyCode; }
-    public String getTitle() { return mTitle; }
-    public String getDescription() { return mDescription; }
+    public String getSku() {
+        return mSku;
+    }
+
+    public String getType() {
+        return mType;
+    }
+
+    public String getPrice() {
+        return mPrice;
+    }
+
+    public long getPriceAmountMicros() {
+        return mPriceAmountMicros;
+    }
+
+    public String getPriceCurrencyCode() {
+        return mPriceCurrencyCode;
+    }
+
+    public String getTitle() {
+        return mTitle;
+    }
+
+    public String getDescription() {
+        return mDescription;
+    }
 
     @Override
     public String toString() {

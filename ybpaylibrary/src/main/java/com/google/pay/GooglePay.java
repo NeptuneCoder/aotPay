@@ -1,6 +1,7 @@
 package com.google.pay;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -12,6 +13,7 @@ import com.yiba.pay.YiBaPayConfig;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -129,16 +131,20 @@ public class GooglePay {
                 return;
             }
 
-            Purchase gasPurchase = inventory.getPurchase(productId);
-            Log.i("test", "gasPurchase is null = " + (gasPurchase == null));
-            if (gasPurchase != null) {
-                try {
-                    Log.i("test", "inventory = " + inventory.getPurchase(productId));
-                    mHelper.consumeAsync(inventory.getPurchase(productId), mConsumeFinishedListener);
-                } catch (IabHelper.IabAsyncInProgressException e) {
+            //通过 inventory 对象的mPurchaseMap 属性，获取未消耗的商品，迭代该集合对齐调用消耗方法
+            if (inventory != null && !inventory.mPurchaseMap.isEmpty()) {
+                for (Map.Entry<String, Purchase> item : inventory.mPurchaseMap.entrySet()) {
+                    try {
+                        Log.i("test", "inventory = " + inventory.getPurchase(item.getKey()));
+                        mHelper.consumeAsync(inventory.getPurchase(item.getKey()), mConsumeFinishedListener);
+                    } catch (IabHelper.IabAsyncInProgressException e) {
+                    }
                 }
-                return;
             }
+
+
+
+
 
 
             /*
@@ -151,7 +157,9 @@ public class GooglePay {
     };
 
     public void unRegister() {
-        PackageManager pm = YiBaPayConfig.getContext().getPackageManager();
+        Context cnt = YiBaPayConfig.getContext();
+        if (cnt == null) return;
+        PackageManager pm = cnt.getPackageManager();
         Intent intent = new Intent(IabBroadcastReceiver.ACTION);
         List<ResolveInfo> list = pm.queryBroadcastReceivers(intent, 0);
         if (list != null && !list.isEmpty()) {
@@ -210,15 +218,7 @@ public class GooglePay {
 
             if (result.isFailure()) {
                 if (result.getResponse() == 7) {
-                    try {
-                        purchase = (Purchase) SaveObjectUtils.getObject(activity, "purchase");
-                        if (mHelper != null && purchase != null) { //如果两个商品id一样，则去消耗
-                            mHelper.consumeAsync(purchase, mConsumeFinishedListener);
-                        }
-                    } catch (ClassCastException e) {
-                    } catch (IabHelper.IabAsyncInProgressException e) {
-                        e.printStackTrace();
-                    }
+
                 }
                 if (listener != null) {
                     listener.callBackStatus(result.getResponse());
@@ -229,7 +229,7 @@ public class GooglePay {
 
 //                return;
 //            }
-            if (currBuyType != null && currBuyType.equals(IabHelper.ITEM_TYPE_INAPP)) {
+            if (purchase != null && purchase.getSku() != null && currBuyType != null && currBuyType.equals(IabHelper.ITEM_TYPE_INAPP)) {
                 Log.i("tag", "Purchase successful.");
                 // bought 1/4 tank of gas. So consume it.
                 if (purchase.getSku().equals(productId)) {//购买成功后，消耗商品
@@ -267,7 +267,6 @@ public class GooglePay {
             // sku, you probably should check...
             Log.i("ConsumeFinished", " is  success = " + result.isSuccess());
             if (result.isSuccess()) {
-                SaveObjectUtils.saveObject(activity, "purchase", null);
                 // successfully consumed, so we apply the effects of the item in our
                 // game world's logic, which in our case means filling the gas tank a bit
                 //TODO 消耗成功
@@ -276,7 +275,6 @@ public class GooglePay {
                     if (purchase != null) {
                         mHelper.consumeAsync(purchase, mConsumeFinishedListener);//后面这个回调在源码中没有做事情，所以没有设置为null
                     }
-                    SaveObjectUtils.saveObject(activity, "purchase", purchase);
 
                 } catch (IabHelper.IabAsyncInProgressException e) {
                     if (listener != null) {
