@@ -10,3 +10,4 @@
 /app/build/
 /ybpaylibrary/build/
 /.idea/
+/app/gradle.properties

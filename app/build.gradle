@@ -25,13 +25,13 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            resValue("string", "app_name", "易跋Pay")
+            resValue("string", "app_name", "atPay")
             signingConfig signingConfigs.config
         }
         debug{
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            resValue("string", "app_name", "易跋Pay-测试")
+            resValue("string", "app_name", "aT-测试")
             signingConfig signingConfigs.config
         }
     }
