@@ -21,4 +21,10 @@
 
 1. 在根目录build.gradle中配置需要修改为 apply from : 'config.gradle'
 
-2. 
+配置该文件：/app/gradle.properties，内容如下
+```
+KEYALIAS=alias
+KEYPASSWORD=pwd
+STOREFILEPATH=store file path
+STOREPASSWORD= pwd
+```

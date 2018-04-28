@@ -61,10 +61,9 @@ public class WeiXinPay {
 
     public void unRegisterWxBroadCast() {
         if (wxPayResult != null) {
-            if (YiBaPayConfig.getContext() == null) {
-                return;
-            }
-            PackageManager pm = YiBaPayConfig.getContext().getPackageManager();
+            Context cnt = YiBaPayConfig.getContext();
+            if (cnt == null) return;
+            PackageManager pm = cnt.getPackageManager();
             Intent intent = new Intent(ACTION);
             List<ResolveInfo> list = pm.queryBroadcastReceivers(intent, 0);
             if (list != null && !list.isEmpty()) {

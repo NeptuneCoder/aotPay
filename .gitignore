@@ -11,3 +11,4 @@
 /ybpaylibrary/build/
 /.idea/
 /app/gradle.properties
+/app/src/main/java/demo.alipay.com.ybpaydemo/PublickKeyConfig.java

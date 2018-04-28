@@ -43,7 +43,6 @@ public class GooglePay {
     static final int RC_REQUEST = 10001;
 
     private Activity activity;
-    private String base64;
 
     public GooglePay(final Activity activity, String base64, IGooglePayStatus listener) {
         this.listener = listener;
@@ -52,7 +51,6 @@ public class GooglePay {
 
 
     public void GgPayInit(final Activity activity, String base64) {
-        this.base64 = base64;
         this.activity = activity;
         mHelper = new IabHelper(activity, base64, new IabHelperCallback() {
             @Override
@@ -142,17 +140,11 @@ public class GooglePay {
                 }
             }
 
-
-
-
-
-
             /*
              * Check for items we own. Notice that for each purchase, we check
              * the developer payload to see if it's correct! See
              * verifyDeveloperPayload().
              */
-
         }
     };
 
@@ -167,7 +159,7 @@ public class GooglePay {
         }
     }
 
-    public String productId = "vip_1_month";
+    public String productId = "";
 
     public void buyGoods(final Activity activity, final String productId, final String developerPayload) {
         this.productId = productId;
