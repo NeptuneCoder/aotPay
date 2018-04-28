@@ -261,6 +261,7 @@ public class GooglePay {
             Log.i("currentThread", "currentThread mConsumeFinishedListener= " + String.valueOf(Thread.currentThread().getName()));
             // if we were disposed of in the meantime, quit.
             if (mHelper == null) return;
+            if (mHelper.mDisposed) return;
 
             // We know this is the "gas" sku because it's the only one we consume,
             // so we don't check which sku was consumed. If you have more than one
