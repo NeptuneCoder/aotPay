@@ -13,32 +13,27 @@ public class YiBaPayConfig {
     public static String mGgAppId;
 
 
-    public  static void setContext(Context context){
+    public static void setContext(Context context) {
         mcontext = context;
     }
 
-    public static Context getContext(){
-
-        if (mcontext == null){
-            throw  new NullPointerException("please init context");
-        }
-
+    public static Context getContext() {
         return mcontext;
     }
 
-    public static void setWxAppId(String wxAppId){
-        mWxAppId = wxAppId ;
+    public static void setWxAppId(String wxAppId) {
+        mWxAppId = wxAppId;
     }
 
-    public static String getWxAppId(){
+    public static String getWxAppId() {
         return mWxAppId;
     }
 
-    public static void setGgAppId(String ggAppId){
-        mGgAppId = ggAppId ;
+    public static void setGgAppId(String ggAppId) {
+        mGgAppId = ggAppId;
     }
 
-    public static String getGgAppId(){
+    public static String getGgAppId() {
         return mGgAppId;
     }
 }

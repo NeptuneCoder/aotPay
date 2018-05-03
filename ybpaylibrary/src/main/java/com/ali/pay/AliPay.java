@@ -10,27 +10,31 @@ import java.util.Map;
 public class AliPay {
 
     private final IAliResultCallback iAliResultCallback;
+    private PayTask alipay;
+    private Runnable runnable;
 
     public AliPay(IAliResultCallback iAliResultCallback) {
         this.iAliResultCallback = iAliResultCallback;
+
     }
 
-    public void aliPay() {
-
+    private void init() {
         if (iAliResultCallback == null || iAliResultCallback.getOrderInfo() == null) {
             throw new NullPointerException("aliOrderInfo  为商品信息不能为空，需要实现 IGetAliOrderInfoListener 接口 同时调用setOrderInfo方法");
         }
-        Runnable runnable = new Runnable() {
+        alipay = new PayTask((Activity) YiBaPayConfig.getContext());
+        runnable = new Runnable() {
             @Override
             public void run() {
-                PayTask alipay = new PayTask((Activity) YiBaPayConfig.getContext());
                 Map<String, String> result = alipay.payV2(iAliResultCallback.getOrderInfo(), true);
                 iAliResultCallback.onResult(result);
             }
         };
+    }
 
+    public void aliPay() throws NullPointerException {
+        init();
         Thread payThread = new Thread(runnable);
         payThread.start();
-
     }
 }

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_centerVertical="true"
+    android:background="@drawable/bg_of_pay_dialog">
+
+    <RelativeLayout
+        android:id="@+id/rl_business"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/stripe_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20pt"
+            android:layout_marginRight="20pt"
+            android:layout_marginTop="40pt"
+            android:text="@string/stripe_title"
+            android:textSize="32pt" />
+
+        <com.stripe.android.view.CardMultilineWidget
+            android:id="@+id/card_input_widget"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/stripe_title"
+            android:layout_marginLeft="20pt"
+            android:layout_marginRight="20pt"
+            android:layout_marginTop="20pt" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="74pt"
+            android:layout_below="@id/card_input_widget"
+            android:layout_marginBottom="20pt"
+            android:layout_marginLeft="10pt"
+            android:layout_marginRight="10pt"
+            android:layout_marginTop="70pt"
+            android:gravity="center_vertical">
+
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10pt"
+                android:src="@drawable/pay_log_stripe" />
+
+            <Button
+                android:id="@+id/stripe_pay_sure"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="68pt"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="20pt"
+                android:background="@drawable/select_btn_pay"
+                android:text="@string/buy"
+                android:textColor="@color/white"
+                android:textSize="24pt" />
+        </RelativeLayout>
+
+        <ImageView
+            android:id="@+id/iv_close"
+            android:layout_width="32pt"
+            android:layout_height="32pt"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="30pt"
+            android:layout_marginTop="40pt"
+            android:src="@drawable/ad_loading_close" />
+    </RelativeLayout>
+
+
+    <com.dbq.fast.business.product.ui.StatusView
+        android:id="@+id/status_view"
+        android:layout_width="match_parent"
+        android:layout_height="270pt"
+        android:visibility="gone" />
+</RelativeLayout>

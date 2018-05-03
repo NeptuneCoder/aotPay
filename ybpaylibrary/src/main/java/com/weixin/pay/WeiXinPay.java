@@ -67,7 +67,7 @@ public class WeiXinPay {
             Intent intent = new Intent(ACTION);
             List<ResolveInfo> list = pm.queryBroadcastReceivers(intent, 0);
             if (list != null && !list.isEmpty()) {
-                YiBaPayConfig.getContext().unregisterReceiver(wxPayResult);
+                cnt.unregisterReceiver(wxPayResult);
             }
         }
     }

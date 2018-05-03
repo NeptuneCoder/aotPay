@@ -16,12 +16,12 @@ public class PayWindow extends PopupWindow {
     private onPayListener listener;
 
     public PayWindow(Context context){
-        View rootView = LayoutInflater.from(context).inflate(com.yiba.pay.R.layout.popupwindow_pay,null);
+        View rootView = LayoutInflater.from(context).inflate(R.layout.popupwindow_pay,null);
         setContentView(rootView);
         setWidth(LinearLayout.LayoutParams.WRAP_CONTENT);
         setHeight(LinearLayout.LayoutParams.WRAP_CONTENT);
         setOutsideTouchable(true);
-        rootView.findViewById(com.yiba.pay.R.id.ali_pay).setOnClickListener(new View.OnClickListener() {
+        rootView.findViewById(R.id.ali_pay).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (listener!=null){
@@ -29,7 +29,7 @@ public class PayWindow extends PopupWindow {
                 }
             }
         });
-        rootView.findViewById(com.yiba.pay.R.id.wx_pay).setOnClickListener(new View.OnClickListener() {
+        rootView.findViewById(R.id.wx_pay).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (listener!=null){
@@ -37,7 +37,7 @@ public class PayWindow extends PopupWindow {
                 }
             }
         });
-        rootView.findViewById(com.yiba.pay.R.id.stripe_pay).setOnClickListener(new View.OnClickListener() {
+        rootView.findViewById(R.id.stripe_pay).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (listener!= null){

@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements IGetAliOrderInfoL
 
                     @Override
                     public String getOrderInfo() {
-                        return null;
+                        return OrderInfoEt.getText().toString();
                     }
                 });
                 aliPay.aliPay();
@@ -117,22 +117,7 @@ public class MainActivity extends AppCompatActivity implements IGetAliOrderInfoL
 ////                }else{
 ////                    Toast.makeText(MainActivity.this,"订单信息不能为空",Toast.LENGTH_LONG).show();
 ////                }
-                YiBaPayManager.getInstance().show(findViewById(R.id.select_Pay), new YiBaPayManager.OnGenerateOrderCallback() {
-                    @Override
-                    public void generateAliOrder() {
 
-                    }
-
-                    @Override
-                    public void generateWxOrder() {
-
-                    }
-
-                    @Override
-                    public void generateStripeOrder() {
-
-                    }
-                });
             }
         });
         YiBaPayManager.getInstance().setOnResultListener(new IResultListener() {

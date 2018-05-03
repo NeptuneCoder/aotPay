@@ -219,48 +219,6 @@ public class YiBaPayManager {
     }
 
 
-    /**
-     * 这里随便传入一个布局
-     *
-     * @param parent
-     */
-    public void show(View parent, final OnGenerateOrderCallback callback) {
-        final PayWindow payWindow = new PayWindow(YiBaPayConfig.getContext());
-        payWindow.showAtLocation(parent);
-        payWindow.setPayListener(new PayWindow.onPayListener() {
-            @Override
-            public void aliPay() {
-                if (callback != null) {
-                    callback.generateAliOrder();
-                }
-                payWindow.dismiss();
-            }
-
-            @Override
-            public void wxPay() {
-                if (callback != null) {
-                    callback.generateWxOrder();
-                }
-                payWindow.dismiss();
-            }
-
-            @Override
-            public void stripePay() {
-                if (callback != null) {
-                    callback.generateStripeOrder();
-                }
-                payWindow.dismiss();
-            }
-        });
-    }
-
-    public interface OnGenerateOrderCallback {
-        void generateAliOrder();
-
-        void generateWxOrder();
-
-        void generateStripeOrder();
-    }
 
 
     private GooglePay googlePay;

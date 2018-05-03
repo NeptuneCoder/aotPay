@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">stripePay</string>
+    <string name="stripe_title"> Add Payment Info</string>
+    <string name="buy">Purchase</string>
 </resources>
