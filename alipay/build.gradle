@@ -22,6 +22,18 @@ android {
         }
     }
 
+    //修改生成的apk名字
+    libraryVariants.all { variant ->
+        variant.outputs.all { output ->
+            def outputFile = output.outputFile
+            if (outputFile != null && outputFile.name.endsWith('.aar')) {
+                def fileName = outputFile.name.replace("alipay",
+                        "ybPay-v${rootProject.android.versionName}_alipay_${releaseTime()}")
+                outputFileName = fileName
+            }
+        }
+    }
+
 }
 
 dependencies {

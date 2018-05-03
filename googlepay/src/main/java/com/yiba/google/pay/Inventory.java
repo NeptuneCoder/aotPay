@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package com.google.pay;
+package com.yiba.google.pay;
 
 import java.util.ArrayList;
 import java.util.HashMap;

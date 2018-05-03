@@ -7,9 +7,6 @@ import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.google.pay.GooglePay;
-import com.google.pay.IGooglePayResultListener;
-import com.google.pay.IGooglePayStatus;
 import com.weixin.pay.IGetWxOrderInfoListener;
 import com.weixin.pay.IWeiXinCallback;
 import com.weixin.pay.IWxResult;
@@ -20,6 +17,9 @@ import com.yiba.ali.pay.IAliResult;
 import com.yiba.ali.pay.IAliResultCallback;
 import com.yiba.ali.pay.IGetAliOrderInfoListener;
 import com.yiba.ali.pay.PayResult;
+import com.yiba.google.pay.GooglePay;
+import com.yiba.google.pay.IGooglePayResultListener;
+import com.yiba.google.pay.IGooglePayStatus;
 
 import java.util.Map;
 

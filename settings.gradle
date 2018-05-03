@@ -1,1 +1,1 @@
-include ':app', ':ybpaylibrary', ':stripepay', ':alipay', ':weixinpay'
+include ':app', ':ybpaylibrary', ':stripepay', ':alipay', ':weixinpay', ':googlepay'

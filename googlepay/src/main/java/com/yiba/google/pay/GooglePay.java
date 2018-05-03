@@ -1,15 +1,11 @@
-package com.google.pay;
+package com.yiba.google.pay;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.util.Log;
-
-import com.yiba.pay.YiBaPayConfig;
-
 
 import java.io.Serializable;
 import java.util.List;
@@ -149,9 +145,7 @@ public class GooglePay {
     };
 
     public void unRegister() {
-        Context cnt = YiBaPayConfig.getContext();
-        if (cnt == null) return;
-        PackageManager pm = cnt.getPackageManager();
+        PackageManager pm = activity.getPackageManager();
         Intent intent = new Intent(IabBroadcastReceiver.ACTION);
         List<ResolveInfo> list = pm.queryBroadcastReceivers(intent, 0);
         if (list != null && !list.isEmpty()) {

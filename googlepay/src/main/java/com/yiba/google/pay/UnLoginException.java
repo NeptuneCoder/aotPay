@@ -1,4 +1,4 @@
-package com.google.pay;
+package com.yiba.google.pay;
 
 /**
  * Created by yh on 2018/1/17.

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package com.google.pay;
+package com.yiba.google.pay;
 
 /**
  * Represents the result of an in-app billing operation.

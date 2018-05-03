@@ -1,4 +1,4 @@
-package com.google.pay;
+package com.yiba.google.pay;
 
 import java.util.Random;
 

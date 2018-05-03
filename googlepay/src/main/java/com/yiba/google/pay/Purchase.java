@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package com.google.pay;
+package com.yiba.google.pay;
 
 import org.json.JSONException;
 import org.json.JSONObject;
