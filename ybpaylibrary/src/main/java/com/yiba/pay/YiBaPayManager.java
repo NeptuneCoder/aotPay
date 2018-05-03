@@ -7,11 +7,6 @@ import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.weixin.pay.IGetWxOrderInfoListener;
-import com.weixin.pay.IWeiXinCallback;
-import com.weixin.pay.IWxResult;
-import com.weixin.pay.WeiXinPay;
-import com.weixin.pay.WxPayInfo;
 import com.yiba.ali.pay.AliPay;
 import com.yiba.ali.pay.IAliResult;
 import com.yiba.ali.pay.IAliResultCallback;
@@ -20,6 +15,11 @@ import com.yiba.ali.pay.PayResult;
 import com.yiba.google.pay.GooglePay;
 import com.yiba.google.pay.IGooglePayResultListener;
 import com.yiba.google.pay.IGooglePayStatus;
+import com.yiba.wx.pay.IGetWxOrderInfoListener;
+import com.yiba.wx.pay.IWeiXinCallback;
+import com.yiba.wx.pay.IWxResult;
+import com.yiba.wx.pay.WeiXinPay;
+import com.yiba.wx.pay.WxPayInfo;
 
 import java.util.Map;
 
@@ -198,7 +198,7 @@ public class YiBaPayManager {
         if (wxOrderInfo == null) {
             throw new NullPointerException("wxOrderInfo  为商品信息不能为空，需要实现 IGetWxOrderInfoListener 接口 同时调用setOrderInfo方法");
         }
-        weiXinPay = new WeiXinPay(new IWeiXinCallback() {
+        weiXinPay = new WeiXinPay((Activity) YiBaPayConfig.getContext(), YiBaPayConfig.getWxAppId(), new IWeiXinCallback() {
             @Override
             public WxPayInfo getWxPayInfo() {
                 return wxOrderInfo.getWxPayInfo();

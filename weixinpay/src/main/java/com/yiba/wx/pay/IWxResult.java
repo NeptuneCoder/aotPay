@@ -1,4 +1,4 @@
-package com.weixin.pay;
+package com.yiba.wx.pay;
 
 /**
  * Created by yh on 2018/1/17.

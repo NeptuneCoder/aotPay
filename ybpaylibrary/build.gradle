@@ -40,8 +40,8 @@ dependencies {
 //    implementation fileTree(include: ['*.jar'], dir: 'libs')
     //微信支付的依赖
 //    implementation 'com.tencent.mm.opensdk:wechat-sdk-android-without-mta:+'
-    implementation files('libs/alipaySdk-20170922.jar')
-    implementation 'com.tencent.mm.opensdk:wechat-sdk-android-without-mta:1.0.2'
+
+
 //    //stripe支付的依赖
 //    implementation 'com.stripe:stripe-android:5.1.0'
 //
@@ -53,6 +53,7 @@ dependencies {
 
     compile project(path: ':alipay')
     compile project(path: ':googlepay')
+    compile project(path: ':weixinpay')
 }
 assemble << {
     logger.quiet("assemble exe finish")

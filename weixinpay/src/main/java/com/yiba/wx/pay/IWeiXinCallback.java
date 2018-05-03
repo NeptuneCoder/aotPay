@@ -1,4 +1,4 @@
-package com.weixin.pay;
+package com.yiba.wx.pay;
 
 public interface IWeiXinCallback {
 
