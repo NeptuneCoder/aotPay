@@ -1,4 +1,4 @@
-package com.ali.pay;
+package com.yiba.ali.pay;
 
 import java.util.Map;
 

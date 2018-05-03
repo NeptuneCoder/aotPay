@@ -17,6 +17,8 @@ import com.google.pay.IGooglePayResultListener;
 import com.weixin.pay.IGetWxOrderInfoListener;
 import com.weixin.pay.IWeiXinCallback;
 import com.weixin.pay.WeiXinPay;
+import com.yiba.ali.pay.AliPay;
+import com.yiba.ali.pay.IAliResultCallback;
 import com.yiba.pay.IResultListener;
 import com.weixin.pay.WxPayInfo;
 import com.yiba.pay.YiBaPayManager;
@@ -50,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements IGetAliOrderInfoL
 //                        return  OrderInfoEt.getText().toString().trim();
 //                    }
 //                });
-                AliPay aliPay = new AliPay(new IAliResultCallback() {
+                AliPay aliPay = new AliPay(MainActivity.this, new IAliResultCallback() {
                     @Override
                     public void onResult(Map<String, String> res) {
 
@@ -58,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements IGetAliOrderInfoL
 
                     @Override
                     public String getOrderInfo() {
-                        return OrderInfoEt.getText().toString();
+                        return getAlipayInfo();
                     }
                 });
                 aliPay.aliPay();
@@ -121,15 +123,7 @@ public class MainActivity extends AppCompatActivity implements IGetAliOrderInfoL
             }
         });
         YiBaPayManager.getInstance().setOnResultListener(new IResultListener() {
-            @Override
-            public void onAliFailed(int i) {
 
-            }
-
-            @Override
-            public void onAliSuccess() {
-
-            }
 
             @Override
             public void onGgFailed(int i) {
@@ -184,7 +178,7 @@ public class MainActivity extends AppCompatActivity implements IGetAliOrderInfoL
         String privateKey = rsa2 ? PublicKeyConfig.RSA2_PRIVATE : PublicKeyConfig.RSA_PRIVATE;
         String sign = OrderInfoUtil2_0.getSign(params, privateKey, rsa2);
         final String orderInfo = orderParam + "&" + sign;
-        return OrderInfoEt.getText().toString().trim();
+        return orderInfo;//OrderInfoEt.getText().toString().trim();
     }
 
     @Override
@@ -213,6 +207,7 @@ public class MainActivity extends AppCompatActivity implements IGetAliOrderInfoL
         super.onDestroy();
         YiBaPayManager.getInstance().DestoryQuote();
     }
+
 }
 
 

@@ -51,6 +51,7 @@ dependencies {
 //        exclude group : 'ccom.android.support',module:'appcompat-v7'
 //    }
 
+    compile project(path: ':alipay')
 }
 assemble << {
     logger.quiet("assemble exe finish")

@@ -55,5 +55,6 @@ dependencies {
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
 //    implementation(name: "yibaPay-v2.5.3_2018-01-17-release", ext: 'aar')
     implementation project(':ybpaylibrary')
+    compile project(path: ':alipay')
 }
 

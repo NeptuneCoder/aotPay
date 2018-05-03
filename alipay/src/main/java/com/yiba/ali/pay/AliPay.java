@@ -1,9 +1,9 @@
-package com.ali.pay;
+package com.yiba.ali.pay;
 
 import android.app.Activity;
+import android.content.Context;
 
 import com.alipay.sdk.app.PayTask;
-import com.yiba.pay.YiBaPayConfig;
 
 import java.util.Map;
 
@@ -13,16 +13,16 @@ public class AliPay {
     private PayTask alipay;
     private Runnable runnable;
 
-    public AliPay(IAliResultCallback iAliResultCallback) {
+    public AliPay(Activity activity, IAliResultCallback iAliResultCallback) {
         this.iAliResultCallback = iAliResultCallback;
-
+        init(activity);
     }
 
-    private void init() {
+    private void init(Activity activity) {
         if (iAliResultCallback == null || iAliResultCallback.getOrderInfo() == null) {
             throw new NullPointerException("aliOrderInfo  为商品信息不能为空，需要实现 IGetAliOrderInfoListener 接口 同时调用setOrderInfo方法");
         }
-        alipay = new PayTask((Activity) YiBaPayConfig.getContext());
+        alipay = new PayTask(activity);
         runnable = new Runnable() {
             @Override
             public void run() {
@@ -33,7 +33,6 @@ public class AliPay {
     }
 
     public void aliPay() throws NullPointerException {
-        init();
         Thread payThread = new Thread(runnable);
         payThread.start();
     }

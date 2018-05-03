@@ -6,13 +6,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.View;
 
-import com.ali.pay.AliPay;
-import com.ali.pay.IGetAliOrderInfoListener;
-import com.ali.pay.IAliResultCallback;
-import com.ali.pay.IAliResult;
-import com.ali.pay.PayResult;
 import com.google.pay.GooglePay;
 import com.google.pay.IGooglePayResultListener;
 import com.google.pay.IGooglePayStatus;
@@ -21,6 +15,11 @@ import com.weixin.pay.IWeiXinCallback;
 import com.weixin.pay.IWxResult;
 import com.weixin.pay.WeiXinPay;
 import com.weixin.pay.WxPayInfo;
+import com.yiba.ali.pay.AliPay;
+import com.yiba.ali.pay.IAliResult;
+import com.yiba.ali.pay.IAliResultCallback;
+import com.yiba.ali.pay.IGetAliOrderInfoListener;
+import com.yiba.ali.pay.PayResult;
 
 import java.util.Map;
 
@@ -56,7 +55,6 @@ public class YiBaPayManager {
                         // 该笔订单是否真实支付成功，需要依赖服务端的异步通知。
                         if (resultListener != null) {
                             resultListener.onAliSuccess();
-
                         }
                         if (aliResultListener != null) {
                             aliResultListener.onAliSuccess();
@@ -148,7 +146,6 @@ public class YiBaPayManager {
     }
 
 
-
     /**
      * 设置支付结果的回调
      *
@@ -174,7 +171,7 @@ public class YiBaPayManager {
         if (aliOrderInfo == null) {
             throw new NullPointerException("aliOrderInfo  为商品信息不能为空，需要实现 IGetAliOrderInfoListener 接口 同时调用setOrderInfo方法");
         }
-        AliPay alipay = new AliPay(new IAliResultCallback() {
+        AliPay alipay = new AliPay((Activity) YiBaPayConfig.getContext(), new IAliResultCallback() {
             @Override
             public void onResult(Map<String, String> res) {
                 Message msg = handler.obtainMessage();
@@ -187,6 +184,7 @@ public class YiBaPayManager {
             public String getOrderInfo() {
                 return aliOrderInfo.getAlipayInfo();
             }
+
         });
         alipay.aliPay();
     }
@@ -217,8 +215,6 @@ public class YiBaPayManager {
         weiXinPay.wxPay();
 
     }
-
-
 
 
     private GooglePay googlePay;
@@ -298,7 +294,6 @@ public class YiBaPayManager {
         YiBaPayConfig.setGgAppId(null);
 
     }
-
 
 
     public boolean bindCallBack(int requestCode, int resultCode, Intent data) {
