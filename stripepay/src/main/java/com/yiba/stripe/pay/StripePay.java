@@ -24,7 +24,7 @@ public class StripePay {
         this.publicKey = publicKey;
     }
 
-    public String generateKey(@IntRange(from = 0) long amount, @NonNull String currency, @Nullable String name, @Nullable String email, @NonNull String returnUrl) {
+    public Source generateKey(@IntRange(from = 0) long amount, @NonNull String currency, @Nullable String name, @Nullable String email, @NonNull String returnUrl) throws APIException, AuthenticationException, InvalidRequestException, APIConnectionException {
         /**
          *  @IntRange(from = 0) long amount,
          @NonNull String currency,
@@ -35,20 +35,8 @@ public class StripePay {
         final SourceParams sourceParams = SourceParams.createAlipaySingleUseParams(amount, currency, name, email, returnUrl);
         final Stripe stripe = new Stripe(activity);
         Source source = null;
-        try {
-            source = stripe.createSourceSynchronous(sourceParams, publicKey);
-            Map<String, Object> result = source.getSourceTypeData();
-            return (String) result.get("data_string");
-        } catch (AuthenticationException e) {
-            return e.toString();
-        } catch (InvalidRequestException e) {
-            e.printStackTrace();
-            return e.toString();
-        } catch (APIConnectionException e) {
-            e.printStackTrace();
-            return e.toString();
-        } catch (APIException e) {
-            return e.toString();
-        }
+        source = stripe.createSourceSynchronous(sourceParams, publicKey);
+        return source;
+
     }
 }

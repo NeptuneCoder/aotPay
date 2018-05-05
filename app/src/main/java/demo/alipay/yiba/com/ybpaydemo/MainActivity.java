@@ -8,26 +8,25 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.ali.pay.AliPay;
-import com.ali.pay.IAliResultCallback;
-import com.ali.pay.IGetAliOrderInfoListener;
-import com.google.pay.RandomString;
-import com.google.pay.GooglePay;
-import com.google.pay.IGooglePayResultListener;
-import com.weixin.pay.IGetWxOrderInfoListener;
-import com.weixin.pay.IWeiXinCallback;
-import com.weixin.pay.WeiXinPay;
 import com.yiba.ali.pay.AliPay;
 import com.yiba.ali.pay.IAliResultCallback;
+import com.yiba.ali.pay.IGetAliOrderInfoListener;
+import com.yiba.google.pay.GooglePay;
+import com.yiba.google.pay.IGooglePayResultListener;
+import com.yiba.google.pay.RandomString;
 import com.yiba.pay.IResultListener;
-import com.weixin.pay.WxPayInfo;
+
 import com.yiba.pay.YiBaPayManager;
 import com.yiba.pay.YiBaPayConfig;
+import com.yiba.sa.pay.StripeAliPay;
+import com.yiba.wx.pay.IWeiXinCallback;
+import com.yiba.wx.pay.WeiXinPay;
+import com.yiba.wx.pay.WxPayInfo;
 
 import java.util.Map;
 
 
-public class MainActivity extends AppCompatActivity implements IGetAliOrderInfoListener, IGetWxOrderInfoListener {
+public class MainActivity extends AppCompatActivity {
     /**
      * 支付宝支付业务：入参app_id
      */
@@ -39,19 +38,13 @@ public class MainActivity extends AppCompatActivity implements IGetAliOrderInfoL
         setContentView(R.layout.activity_main);
         YiBaPayConfig.setContext(this);
         YiBaPayConfig.setGgAppId(PublicKeyConfig.GOOGLE_ID);
+        YiBaPayConfig.setGgAppId(PublicKeyConfig.WxAppId);
         YiBaPayManager.getInstance().initGooglePay(this);
 
         OrderInfoEt = findViewById(R.id.et);
-
         findViewById(R.id.ali_pay).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                YiBaPayManager.getInstance().aliPay(new IGetAliOrderInfoListener() {
-//                    @Override
-//                    public String getAlipayInfo() {
-//                        return  OrderInfoEt.getText().toString().trim();
-//                    }
-//                });
                 AliPay aliPay = new AliPay(MainActivity.this, new IAliResultCallback() {
                     @Override
                     public void onResult(Map<String, String> res) {
@@ -69,18 +62,11 @@ public class MainActivity extends AppCompatActivity implements IGetAliOrderInfoL
         findViewById(R.id.wx_pay).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                YiBaPayManager.getInstance().wxPay(new IGetWxOrderInfoListener() {
-//                    @Override
-//                    public WxPayInfo getWxPayInfo() {
-//
-//                        return null;
-//                    }
-//                });
 
-                WeiXinPay wxPay = new WeiXinPay(new IWeiXinCallback() {
+                WeiXinPay wxPay = new WeiXinPay(MainActivity.this, YiBaPayConfig.getWxAppId(), new IWeiXinCallback() {
                     @Override
                     public WxPayInfo getWxPayInfo() {
-                        return null;
+                        return getWxPayInfo();
                     }
 
                     @Override
@@ -122,11 +108,60 @@ public class MainActivity extends AppCompatActivity implements IGetAliOrderInfoL
 
             }
         });
-        YiBaPayManager.getInstance().setOnResultListener(new IResultListener() {
+        final StripeAliPay stripeAliPay = new StripeAliPay(this, PublicKeyConfig.STRIPE_ID);
+        findViewById(R.id.stripe_ali_pay).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                /**
+                 *    final @NonNull String currency,
+                 final @Nullable String name,
+                 final @Nullable String email,
+                 final @NonNull String returnUrl
+                 */
+                stripeAliPay.pay(4000l, "hkd", "YH", "YANGHAI0523@gmail.com", "mycompany://alipay", new StripeAliPay.OnPayStatusListener() {
+                    @Override
+                    public void start() {
+                        Toast.makeText(MainActivity.this, " start ", Toast.LENGTH_LONG).show();
+                    }
 
+                    @Override
+                    public void stripeError(String e) {
+                        Toast.makeText(MainActivity.this, "stripe err ,content =  " + e, Toast.LENGTH_LONG).show();
+
+                    }
+
+                    @Override
+                    public void complete() {
+                        Toast.makeText(MainActivity.this, "stripe complete ,then invoke alipay api", Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void aliPayFaile(int code) {
+                        Toast.makeText(MainActivity.this, "ali pay err = " + code, Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void aliPaySuccess(String payToken) {
+                        Toast.makeText(MainActivity.this, "ali pay success", Toast.LENGTH_LONG).show();
+                    }
+
+
+                });
+            }
+        });
+        YiBaPayManager.getInstance().setOnResultListener(new IResultListener() {
+            @Override
+            public void onAliFailed(int code) {
+
+            }
 
             @Override
-            public void onGgFailed(int i) {
+            public void onAliSuccess() {
+
+            }
+
+            @Override
+            public void onGgFailed(int code) {
 
             }
 
@@ -137,7 +172,7 @@ public class MainActivity extends AppCompatActivity implements IGetAliOrderInfoL
 
 
             @Override
-            public void onWxFailed(int i) {
+            public void onWxFailed(int code) {
 
             }
 
@@ -169,7 +204,7 @@ public class MainActivity extends AppCompatActivity implements IGetAliOrderInfoL
      *
      * @return
      */
-    @Override
+
     public String getAlipayInfo() {
         boolean rsa2 = (PublicKeyConfig.RSA2_PRIVATE.length() > 0);
         Map<String, String> params = OrderInfoUtil2_0.buildOrderParamMap(PublicKeyConfig.APPID, rsa2);
@@ -181,7 +216,7 @@ public class MainActivity extends AppCompatActivity implements IGetAliOrderInfoL
         return orderInfo;//OrderInfoEt.getText().toString().trim();
     }
 
-    @Override
+
     public WxPayInfo getWxPayInfo() {
         return null;
     }

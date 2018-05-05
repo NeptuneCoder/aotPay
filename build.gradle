@@ -29,7 +29,7 @@ allprojects {
 }
 //这个函数定义在这里是为了全局调用
 def releaseTime() {
-    new Date().format("yyyy-MM-dd", TimeZone.getTimeZone("UTC"))
+    new Date().format("yyyy-MM-dd-mm", TimeZone.getTimeZone("UTC"))
 }
 
 

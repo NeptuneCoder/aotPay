@@ -28,7 +28,7 @@ android {
         variant.outputs.all { output ->
             def outputFile = output.outputFile
             if (outputFile != null && outputFile.name.endsWith('.aar')) {
-                def fileName = outputFile.name.replace("stripe",
+                def fileName = outputFile.name.replace("stripepay",
                         "ybPay-v${rootProject.android.versionName}_stripe_${releaseTime()}")
                 outputFileName = fileName
             }

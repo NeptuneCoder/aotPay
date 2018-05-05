@@ -43,10 +43,10 @@
         android:text="google pay subs" />
 
     <Button
-        android:id="@+id/stripe_pay"
+        android:id="@+id/stripe_ali_pay"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="stripe pay" />
+        android:text="stripe ali pay" />
 
 
 
