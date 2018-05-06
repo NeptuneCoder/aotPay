@@ -32,22 +32,7 @@ public class StripeAliPay {
         this.publishableKey = publishableKey;
 
         stripePay = new StripePay(activity, publishableKey);
-        aliPay = new AliPay(activity, new IAliResultCallback() {
-            @Override
-            public void onResult(final Map<String, String> res) {
-                activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        aliPayResult(res);
-                    }
-                });
-            }
-
-            @Override
-            public String getOrderInfo() {
-                return key;
-            }
-        });
+        aliPay = new AliPay(activity);
     }
 
     public void pay(final @IntRange(from = 0) long amount,
@@ -80,7 +65,22 @@ public class StripeAliPay {
                             }
                         }
                     });
-                    aliPay.aliPay();
+                    aliPay.aliPay(new IAliResultCallback() {
+                        @Override
+                        public void onResult(final Map<String, String> res) {
+                            activity.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    aliPayResult(res);
+                                }
+                            });
+                        }
+
+                        @Override
+                        public String getOrderInfo() {
+                            return key;
+                        }
+                    });
                 } catch (final Exception e) {
 
 //                        if (e instanceof com.stripe.android.exception.APIException){
