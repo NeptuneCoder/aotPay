@@ -45,7 +45,8 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.ali_pay).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AliPay aliPay = new AliPay(MainActivity.this, new IAliResultCallback() {
+                AliPay aliPay = new AliPay(MainActivity.this);
+                aliPay.aliPay(new IAliResultCallback() {
                     @Override
                     public void onResult(Map<String, String> res) {
 
@@ -56,7 +57,6 @@ public class MainActivity extends AppCompatActivity {
                         return getAlipayInfo();
                     }
                 });
-                aliPay.aliPay();
             }
         });
         findViewById(R.id.wx_pay).setOnClickListener(new View.OnClickListener() {
