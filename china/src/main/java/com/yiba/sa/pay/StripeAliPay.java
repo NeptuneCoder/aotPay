@@ -16,7 +16,7 @@ import java.util.Map;
 import com.stripe.android.model.Source;
 
 /**
- * test rebase
+ * test rebase,this  is master branch commit
  */
 public class StripeAliPay {
     private final Activity activity;
