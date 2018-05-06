@@ -10,7 +10,7 @@ public class PublicKeyConfig {
     public static final String RSA2_PRIVATE = "";
     public static final String RSA_PRIVATE = "";
     public static final String GOOGLE_ID = "";
-    public static final String WxAppId = "";
+    public static final String WxAppId = "wxe60d1b76fdcf5504";
     public static final String STRIPE_ID = "";
 
 }

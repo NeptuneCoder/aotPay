@@ -1,5 +1,15 @@
-项目描述：
-      该项目集成了国内的微信，支付宝和国外的google的应用内购买（inapp）,订阅（subs）功能。以及最后是stripe支付
+#### 项目描述：
+      该项目集成了国内的微信，支付宝和国外的google的应用内购买（inapp）,订阅（subs）功能。以及stripe,stripe+alipay支付的sdk。
+
+#### 项目的演变
+
+开始开发的时候，将所有的支付类型都放在了同一个moudle中，随着支付方式越来越多，出现在有些项目中用不到的支付方式，
+造成了代码冗余。在这个时候开始，将各种支付单独的以一个moudle的方式独立维护，当需要某几种支付方式一起使用时，
+再起一个项目整合相关的api。从而达到最大程度的降低代码耦合。也就是现在能看到的每种支付都是独立的moudle.
+
+    通过集成多家支付sdk，发现国内的接入最简单。stripe次之，google支付接入代码简单，但是支付失败的情况太多，而且原因
+很难排查！
+
 
 
 1. google inapp subs  使用过程中可能遇到的问题
@@ -30,3 +40,7 @@ KEYPASSWORD=pwd
 STOREFILEPATH=store file path
 STOREPASSWORD= pwd
 ```
+
+
+
+

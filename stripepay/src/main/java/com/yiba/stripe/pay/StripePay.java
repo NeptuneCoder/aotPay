@@ -13,7 +13,6 @@ import com.stripe.android.exception.InvalidRequestException;
 import com.stripe.android.model.Source;
 import com.stripe.android.model.SourceParams;
 
-import java.util.Map;
 
 public class StripePay {
     private final Activity activity;
