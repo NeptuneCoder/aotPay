@@ -15,6 +15,9 @@ import java.util.Map;
 
 import com.stripe.android.model.Source;
 
+/**
+ * test rebase
+ */
 public class StripeAliPay {
     private final Activity activity;
     private final String publishableKey;
