@@ -23,7 +23,7 @@ public class AliPay {
         if (iAliResultCallback == null) {
             throw new NullPointerException("aliOrderInfo  为商品信息不能为空，需要实现 IGetAliOrderInfoListener 接口 同时调用setOrderInfo方法");
         }
-        if (alipay != null) {
+        if (alipay == null) {
             alipay = new PayTask(activity);
             runnable = new Runnable() {
                 @Override

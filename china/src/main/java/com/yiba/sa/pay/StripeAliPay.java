@@ -65,22 +65,7 @@ public class StripeAliPay {
                             }
                         }
                     });
-                    aliPay.aliPay(new IAliResultCallback() {
-                        @Override
-                        public void onResult(final Map<String, String> res) {
-                            activity.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    aliPayResult(res);
-                                }
-                            });
-                        }
-
-                        @Override
-                        public String getOrderInfo() {
-                            return key;
-                        }
-                    });
+                    continuePay();
                 } catch (final Exception e) {
 
 //                        if (e instanceof com.stripe.android.exception.APIException){
@@ -100,6 +85,29 @@ public class StripeAliPay {
         }).start();
 
     }
+
+    /**
+     * 当用户点击继续购买时，调用该放手，不再生成新的stripe支付key。而是复用之前生成好的，防止反复生成不完成的支付订单。
+     */
+    public void continuePay() {
+        aliPay.aliPay(new IAliResultCallback() {
+            @Override
+            public void onResult(final Map<String, String> res) {
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        aliPayResult(res);
+                    }
+                });
+            }
+
+            @Override
+            public String getOrderInfo() {
+                return key;
+            }
+        });
+    }
+
 
     private void aliPayResult(Map<String, String> res) {
         PayResult payResult = new PayResult(res);
