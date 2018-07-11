@@ -29,7 +29,7 @@ android {
             def outputFile = output.outputFile
             if (outputFile != null && outputFile.name.endsWith('.aar')) {
                 def fileName = outputFile.name.replace("china",
-                        "ybPay-v${rootProject.android.versionName}_china_${releaseTime()}")
+                        "aa-v${rootProject.android.versionName}_china_${releaseTime()}")
                 outputFileName = fileName
             }
         }

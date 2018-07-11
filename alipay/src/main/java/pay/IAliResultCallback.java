@@ -1,9 +1,8 @@
-package com.yiba.ali.pay;
+package pay;
 
 import java.util.Map;
 
 /**
- * Created by yh on 2018/1/17.
  */
 
 public interface IAliResultCallback {

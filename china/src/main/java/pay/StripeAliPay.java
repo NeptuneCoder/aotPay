@@ -1,4 +1,4 @@
-package com.yiba.sa.pay;
+package pay;
 
 import android.app.Activity;
 import android.support.annotation.IntRange;
@@ -6,35 +6,31 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import com.yiba.ali.pay.AliPay;
-import com.yiba.ali.pay.IAliResultCallback;
-import com.yiba.ali.pay.PayResult;
-import com.yiba.stripe.pay.StripePay;
-
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import com.stripe.android.model.Source;
 
 /**
  * test rebase,this  is master branch commit
  */
-public class StripeAliPay {
+public class StripeAliPay implements IStripeAliPay {
     private final Activity activity;
-    private final String publishableKey;
     private String key;
     private StripePay stripePay;
     private Source source;
     private AliPay aliPay;
     private OnPayStatusListener listener;
+    private ExecutorService mExcutorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     public StripeAliPay(final Activity activity, String publishableKey) {
         this.activity = activity;
-        this.publishableKey = publishableKey;
-
         stripePay = new StripePay(activity, publishableKey);
         aliPay = new AliPay(activity);
     }
 
+    @Override
     public void pay(final @IntRange(from = 0) long amount,
                     final @NonNull String currency,
                     final @Nullable String name,
@@ -49,8 +45,7 @@ public class StripeAliPay {
                 }
             }
         });
-
-        new Thread(new Runnable() {
+        mExcutorService.execute(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -82,8 +77,7 @@ public class StripeAliPay {
 
                 }
             }
-        }).start();
-
+        });
     }
 
     /**

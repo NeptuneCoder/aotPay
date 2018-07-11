@@ -1,7 +1,6 @@
-package com.yiba.ali.pay;
+package pay;
 
 import android.app.Activity;
-import android.content.Context;
 
 import com.alipay.sdk.app.PayTask;
 

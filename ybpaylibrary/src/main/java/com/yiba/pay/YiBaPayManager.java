@@ -7,11 +7,11 @@ import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.yiba.ali.pay.AliPay;
-import com.yiba.ali.pay.IAliResult;
-import com.yiba.ali.pay.IAliResultCallback;
-import com.yiba.ali.pay.IGetAliOrderInfoListener;
-import com.yiba.ali.pay.PayResult;
+import pay.AliPay;
+import pay.IAliResult;
+import pay.IAliResultCallback;
+import pay.IGetAliOrderInfoListener;
+import pay.PayResult;
 import com.yiba.google.pay.GooglePay;
 import com.yiba.google.pay.IGooglePayResultListener;
 import com.yiba.google.pay.IGooglePayStatus;
@@ -171,22 +171,22 @@ public class YiBaPayManager {
         if (aliOrderInfo == null) {
             throw new NullPointerException("aliOrderInfo  为商品信息不能为空，需要实现 IGetAliOrderInfoListener 接口 同时调用setOrderInfo方法");
         }
-        AliPay alipay = new AliPay((Activity) YiBaPayConfig.getContext(), new IAliResultCallback() {
-            @Override
-            public void onResult(Map<String, String> res) {
-                Message msg = handler.obtainMessage();
-                msg.what = ALI_PAY;
-                msg.obj = res;
-                handler.sendMessage(msg);
-            }
-
-            @Override
-            public String getOrderInfo() {
-                return aliOrderInfo.getAlipayInfo();
-            }
-
-        });
-        alipay.aliPay();
+//        AliPay alipay = new AliPay((Activity) YiBaPayConfig.getContext(), new IAliResultCallback() {
+//            @Override
+//            public void onResult(Map<String, String> res) {
+//                Message msg = handler.obtainMessage();
+//                msg.what = ALI_PAY;
+//                msg.obj = res;
+//                handler.sendMessage(msg);
+//            }
+//
+//            @Override
+//            public String getOrderInfo() {
+//                return aliOrderInfo.getAlipayInfo();
+//            }
+//
+//        });
+//        alipay.aliPay();
     }
 
     /**

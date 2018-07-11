@@ -8,9 +8,8 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.yiba.ali.pay.AliPay;
-import com.yiba.ali.pay.IAliResultCallback;
-import com.yiba.ali.pay.IGetAliOrderInfoListener;
+import pay.AliPay;
+import pay.IAliResultCallback;
 import com.yiba.google.pay.GooglePay;
 import com.yiba.google.pay.IGooglePayResultListener;
 import com.yiba.google.pay.RandomString;
@@ -18,7 +17,7 @@ import com.yiba.pay.IResultListener;
 
 import com.yiba.pay.YiBaPayManager;
 import com.yiba.pay.YiBaPayConfig;
-import com.yiba.sa.pay.StripeAliPay;
+import pay.StripeAliPay;
 import com.yiba.wx.pay.IWeiXinCallback;
 import com.yiba.wx.pay.WeiXinPay;
 import com.yiba.wx.pay.WxPayInfo;
@@ -40,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         YiBaPayConfig.setGgAppId(PublicKeyConfig.GOOGLE_ID);
         YiBaPayConfig.setGgAppId(PublicKeyConfig.WxAppId);
         YiBaPayManager.getInstance().initGooglePay(this);
-
+        runOnUiThread();
         OrderInfoEt = findViewById(R.id.et);
         findViewById(R.id.ali_pay).setOnClickListener(new View.OnClickListener() {
             @Override

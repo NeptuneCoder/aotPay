@@ -1,4 +1,4 @@
-package com.yiba.stripe.pay;
+package pay;
 
 import android.app.Activity;
 import android.support.annotation.IntRange;

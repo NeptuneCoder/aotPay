@@ -1,4 +1,4 @@
-package com.yiba.ali.pay;
+package pay;
 
 public interface IGetAliOrderInfoListener {
     String getAlipayInfo();

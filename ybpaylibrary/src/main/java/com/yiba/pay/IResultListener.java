@@ -1,6 +1,6 @@
 package com.yiba.pay;
 
-import com.yiba.ali.pay.IAliResult;
+import pay.IAliResult;
 import com.yiba.google.pay.IGooglePayResultListener;
 import com.yiba.wx.pay.IWxResult;
 

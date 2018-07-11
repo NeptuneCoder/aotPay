@@ -1,7 +1,6 @@
-package com.yiba.ali.pay;
+package pay;
 
 /**
- * Created by yh on 2018/1/17.
  */
 
 public interface IAliResult {
