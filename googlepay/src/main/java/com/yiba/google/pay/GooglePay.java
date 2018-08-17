@@ -1,6 +1,7 @@
 package com.yiba.google.pay;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -38,17 +39,15 @@ public class GooglePay {
     IabBroadcastReceiver mBroadcastReceiver;
     static final int RC_REQUEST = 10001;
 
-    private Activity activity;
 
-    public GooglePay(final Activity activity, String base64, IGooglePayStatus listener) {
+    public GooglePay(final Context context, String base64, IGooglePayStatus listener) {
         this.listener = listener;
-        GgPayInit(activity, base64);
+        GgPayInit(context, base64);
     }
 
 
-    public void GgPayInit(final Activity activity, String base64) {
-        this.activity = activity;
-        mHelper = new IabHelper(activity, base64, new IabHelperCallback() {
+    public void GgPayInit(final Context context, String base64) {
+        mHelper = new IabHelper(context, base64, new IabHelperCallback() {
             @Override
             public void onGgSuccess(OrderParam data) {
                 listener.callBackStatus(data);
@@ -67,7 +66,7 @@ public class GooglePay {
                     if (mHelper == null) return;
                     mBroadcastReceiver = new IabBroadcastReceiver(InitSuccessCallback);
                     IntentFilter broadcastFilter = new IntentFilter(IabBroadcastReceiver.ACTION);
-                    activity.registerReceiver(mBroadcastReceiver, broadcastFilter);
+                    context.registerReceiver(mBroadcastReceiver, broadcastFilter);
                     try {
                         mHelper.queryInventoryAsync(mGotInventoryListener);
                     } catch (IabHelper.IabAsyncInProgressException e) {
@@ -144,12 +143,12 @@ public class GooglePay {
         }
     };
 
-    public void unRegister() {
-        PackageManager pm = activity.getPackageManager();
+    synchronized public void unRegister(Context context) {
+        PackageManager pm = context.getPackageManager();
         Intent intent = new Intent(IabBroadcastReceiver.ACTION);
         List<ResolveInfo> list = pm.queryBroadcastReceivers(intent, 0);
         if (list != null && !list.isEmpty()) {
-            activity.unregisterReceiver(mBroadcastReceiver);
+            context.unregisterReceiver(mBroadcastReceiver);
         }
     }
 

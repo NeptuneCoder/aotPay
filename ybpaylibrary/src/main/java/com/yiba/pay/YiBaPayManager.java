@@ -1,6 +1,7 @@
 package com.yiba.pay;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
@@ -12,6 +13,7 @@ import pay.IAliResult;
 import pay.IAliResultCallback;
 import pay.IGetAliOrderInfoListener;
 import pay.PayResult;
+
 import com.yiba.google.pay.GooglePay;
 import com.yiba.google.pay.IGooglePayResultListener;
 import com.yiba.google.pay.IGooglePayStatus;
@@ -38,11 +40,23 @@ public class YiBaPayManager {
     private static IWxResult wxResultListener;
     private static IGooglePayResultListener googleResultListener;
 
+    private YiBaPayManager() {
+        //初始化googepay
+    }
 
-    private static Handler handler = new Handler(YiBaPayConfig.getContext().getMainLooper()) {
+
+    private static class SingleTonHolder {
+        private final static YiBaPayManager INSTANCE = new YiBaPayManager();
+    }
+
+    public static YiBaPayManager getInstance() {
+        return SingleTonHolder.INSTANCE;
+    }
+
+
+    private static Handler handler = new Handler(YiBaPayConfig.getContext().getMainLooper(), new Handler.Callback() {
         @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
+        public boolean handleMessage(Message msg) {
             switch (msg.what) {
                 case ALI_PAY:
                     PayResult payResult = new PayResult((Map<String, String>) msg.obj);
@@ -127,23 +141,9 @@ public class YiBaPayManager {
 
                     break;
             }
-
+            return false;
         }
-    };
-
-
-    private YiBaPayManager() {
-        //初始化googepay
-    }
-
-
-    private static class SingleTonHolder {
-        private final static YiBaPayManager INSTANCE = new YiBaPayManager();
-    }
-
-    public static YiBaPayManager getInstance() {
-        return SingleTonHolder.INSTANCE;
-    }
+    });
 
 
     /**
@@ -171,22 +171,22 @@ public class YiBaPayManager {
         if (aliOrderInfo == null) {
             throw new NullPointerException("aliOrderInfo  为商品信息不能为空，需要实现 IGetAliOrderInfoListener 接口 同时调用setOrderInfo方法");
         }
-//        AliPay alipay = new AliPay((Activity) YiBaPayConfig.getContext(), new IAliResultCallback() {
-//            @Override
-//            public void onResult(Map<String, String> res) {
-//                Message msg = handler.obtainMessage();
-//                msg.what = ALI_PAY;
-//                msg.obj = res;
-//                handler.sendMessage(msg);
-//            }
-//
-//            @Override
-//            public String getOrderInfo() {
-//                return aliOrderInfo.getAlipayInfo();
-//            }
-//
-//        });
-//        alipay.aliPay();
+        AliPay alipay = new AliPay((Activity) YiBaPayConfig.getContext());
+        alipay.aliPay(new IAliResultCallback() {
+            @Override
+            public void onResult(Map<String, String> res) {
+                Message msg = handler.obtainMessage();
+                msg.what = ALI_PAY;
+                msg.obj = res;
+                handler.sendMessage(msg);
+            }
+
+            @Override
+            public String getOrderInfo() {
+                return aliOrderInfo.getAlipayInfo();
+            }
+
+        });
     }
 
     /**
@@ -219,8 +219,8 @@ public class YiBaPayManager {
 
     private GooglePay googlePay;
 
-    public void initGooglePay(Activity activity) {
-        googlePay = new GooglePay(activity, YiBaPayConfig.getGgAppId(), new IGooglePayStatus() {
+    public void initGooglePay(Context context) {
+        googlePay = new GooglePay(context, YiBaPayConfig.getGgAppId(), new IGooglePayStatus() {
 
             @Override
             public void callBackStatus(int status) {
@@ -269,9 +269,9 @@ public class YiBaPayManager {
 
     }
 
-    private void freeGooglePayBroadCast() {
+    private void freeGooglePayBroadCast(Context context) {
         if (googlePay != null) {
-            googlePay.unRegister();
+            googlePay.unRegister(context);
             googlePay.OnDispose();
         }
 
@@ -281,11 +281,11 @@ public class YiBaPayManager {
     /**
      * 销毁引用
      */
-    public void DestoryQuote() {
+    synchronized public void DestoryQuote(Context context) {
         if (weiXinPay != null) {
             weiXinPay.unRegisterWxBroadCast();
         }
-        freeGooglePayBroadCast();
+        freeGooglePayBroadCast(context);
         googleResultListener = null;
         aliResultListener = null;
         wxResultListener = null;

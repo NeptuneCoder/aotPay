@@ -45,7 +45,7 @@ public class StripeAliPay implements IStripeAliPay {
                 }
             }
         });
-        mExcutorService.execute(new Runnable() {
+        mExcutorService.submit(new Runnable() {
             @Override
             public void run() {
                 try {
