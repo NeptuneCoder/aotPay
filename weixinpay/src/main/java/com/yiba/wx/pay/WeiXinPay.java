@@ -17,21 +17,23 @@ import java.util.List;
 
 public class WeiXinPay {
 
-    private final IWeiXinCallback iWeiXinCallback;
+    private IWeiXinCallback iWeiXinCallback;
     private static final String BROADCAST_PERMISSION_DISC = "com.yiba.permissions.YiBaPay";
     public static final String ACTION = "com.yiba.pay.wxResult";
     private final Activity activity;
     private final String wxAppId;
     private IntentFilter filter;
 
-    public WeiXinPay(Activity activity, String wxAppId, IWeiXinCallback iWeiXinCallback) {
-        this.iWeiXinCallback = iWeiXinCallback;
+    public WeiXinPay(Activity activity, String wxAppId) {
         this.activity = activity;
         this.wxAppId = wxAppId;
         filter = new IntentFilter();
         filter.addAction(ACTION);
         activity.registerReceiver(wxPayResult, filter, BROADCAST_PERMISSION_DISC, null);
+    }
 
+    public void setiWeiXinCallback(IWeiXinCallback iWeiXinCallback) {
+        this.iWeiXinCallback = iWeiXinCallback;
     }
 
     public void wxPay() {

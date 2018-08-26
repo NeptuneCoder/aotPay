@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
@@ -42,10 +43,17 @@ public class YiBaPayManager {
 
     private YiBaPayManager() {
         //初始化googepay
+        if (SingleTonHolder.INSTANCE != null) {
+            throw new IllegalArgumentException("不允许反射");
+        }
     }
 
 
     private static class SingleTonHolder {
+        private SingleTonHolder() {
+
+        }
+
         private final static YiBaPayManager INSTANCE = new YiBaPayManager();
     }
 
@@ -54,7 +62,7 @@ public class YiBaPayManager {
     }
 
 
-    private static Handler handler = new Handler(YiBaPayConfig.getContext().getMainLooper(), new Handler.Callback() {
+    private static Handler handler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {
             switch (msg.what) {
@@ -167,11 +175,10 @@ public class YiBaPayManager {
     /**
      * 支付宝支付
      */
-    public void aliPay(final IGetAliOrderInfoListener aliOrderInfo) {
+    public void aliPay(AliPay alipay, final IGetAliOrderInfoListener aliOrderInfo) {
         if (aliOrderInfo == null) {
             throw new NullPointerException("aliOrderInfo  为商品信息不能为空，需要实现 IGetAliOrderInfoListener 接口 同时调用setOrderInfo方法");
         }
-        AliPay alipay = new AliPay((Activity) YiBaPayConfig.getContext());
         alipay.aliPay(new IAliResultCallback() {
             @Override
             public void onResult(Map<String, String> res) {
@@ -194,11 +201,11 @@ public class YiBaPayManager {
      */
     private WeiXinPay weiXinPay;
 
-    public void wxPay(final IGetWxOrderInfoListener wxOrderInfo) {
+    public void wxPay(WeiXinPay weiXinPay, final IGetWxOrderInfoListener wxOrderInfo) {
         if (wxOrderInfo == null) {
             throw new NullPointerException("wxOrderInfo  为商品信息不能为空，需要实现 IGetWxOrderInfoListener 接口 同时调用setOrderInfo方法");
         }
-        weiXinPay = new WeiXinPay((Activity) YiBaPayConfig.getContext(), YiBaPayConfig.getWxAppId(), new IWeiXinCallback() {
+        weiXinPay.setiWeiXinCallback(new IWeiXinCallback() {
             @Override
             public WxPayInfo getWxPayInfo() {
                 return wxOrderInfo.getWxPayInfo();
@@ -219,8 +226,9 @@ public class YiBaPayManager {
 
     private GooglePay googlePay;
 
-    public void initGooglePay(Context context) {
-        googlePay = new GooglePay(context, YiBaPayConfig.getGgAppId(), new IGooglePayStatus() {
+    public void initGooglePay(GooglePay googlePay) {
+        this.googlePay = googlePay;
+        googlePay.setIGooglePayStatus(new IGooglePayStatus() {
 
             @Override
             public void callBackStatus(int status) {

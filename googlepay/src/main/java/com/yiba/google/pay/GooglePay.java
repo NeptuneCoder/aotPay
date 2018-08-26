@@ -40,9 +40,12 @@ public class GooglePay {
     static final int RC_REQUEST = 10001;
 
 
-    public GooglePay(final Context context, String base64, IGooglePayStatus listener) {
-        this.listener = listener;
+    public GooglePay(final Context context, String base64) {
         GgPayInit(context, base64);
+    }
+
+    public void setIGooglePayStatus(IGooglePayStatus listener) {
+        this.listener = listener;
     }
 
 
