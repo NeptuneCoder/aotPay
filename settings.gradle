@@ -1,1 +1,2 @@
 include ':app', ':ybpaylibrary', ':stripepay', ':alipay', ':weixinpay', ':googlepay', ':china'
+include ':ggpaylib'
